@@ -1,4 +1,4 @@
-#include <waitmessagebox.h>
+#include <qt/waitmessagebox.h>
 
 #include <QVBoxLayout>
 #include <QLabel>

@@ -2,7 +2,7 @@
 #define QTUMLEDGERINSTALLERDIALOG_H
 
 #include <QDialog>
-#include <qtumledgertool.h>
+#include <qt/qtumledgertool.h>
 
 class QtumLedgerInstallerDialogPriv;
 

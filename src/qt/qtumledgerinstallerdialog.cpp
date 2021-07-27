@@ -1,6 +1,6 @@
-#include <qtumledgerinstallerdialog.h>
-#include <forms/ui_qtumledgerinstallerdialog.h>
-#include <waitmessagebox.h>
+#include <qt/qtumledgerinstallerdialog.h>
+#include <qt/forms/ui_qtumledgerinstallerdialog.h>
+#include <qt/waitmessagebox.h>
 
 #include <QVariant>
 #include <QMessageBox>
