@@ -109,7 +109,7 @@ private:
     bool isStarted();
     void wait();
 
-    QtumLedgerTool* d;
+    QtumLedgerToolPriv* d;
 };
 
 #endif // QTUMLEDGERTOOL_H

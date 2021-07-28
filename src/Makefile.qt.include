@@ -14,10 +14,7 @@ QT_MOC_CPP = \
   qt/moc_qtumledgertool.cpp \
   qt/moc_waitmessagebox.cpp
 
-BITCOIN_MM = \
-  qt/macdockiconhandler.mm \
-  qt/macnotificationhandler.mm \
-  qt/macos_appnap.mm
+BITCOIN_MM = 
 
 QT_MOC = 
 
@@ -25,6 +22,7 @@ QT_QRC_CPP = qt/qrc_qtum.cpp
 QT_QRC = qt/qtum.qrc
 
 BITCOIN_QT_H = \
+  qt/loader.h \
   qt/qtumledgerinstallerdialog.h \
   qt/waitmessagebox.h \
   qt/qtumledgertool.h
@@ -35,11 +33,12 @@ RES_ICONS = \
   qt/res/icons/bitcoin.png
 
 BITCOIN_QT_BASE_CPP = \
+  qt/loader.cpp \
   qt/qtumledgertool.cpp \
   qt/qtumledgerinstallerdialog.cpp \
   qt/waitmessagebox.cpp
 
-BITCOIN_QT_WINDOWS_CPP = qt/winshutdownmonitor.cpp
+BITCOIN_QT_WINDOWS_CPP = 
 
 
 BITCOIN_QT_CPP = $(BITCOIN_QT_BASE_CPP)
@@ -83,35 +82,28 @@ QT_FORMS_H=$(join $(dir $(QT_FORMS_UI)),$(addprefix ui_, $(notdir $(QT_FORMS_UI:
 # Most files will depend on the forms and moc files as includes. Generate them
 # before anything else.
 $(QT_MOC): $(QT_FORMS_H)
-$(qt_libbitcoinqt_a_OBJECTS) $(qt_qtum_qt_OBJECTS) $(qtum_gui_OBJECTS) : | $(QT_MOC)
+$(qt_libbitcoinqt_a_OBJECTS) $(qt_qtum_loader_qt_OBJECTS) : | $(QT_MOC)
 
 # qtum-qt and qtum-gui binaries #
-qtum_qt_cppflags = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
+qtum_loader_qt_cppflags = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QR_CFLAGS)
-qtum_qt_cxxflags = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
+qtum_loader_qt_cxxflags = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
 
-qtum_qt_sources = qt/main.cpp
+qtum_loader_qt_sources = qt/main.cpp
 if TARGET_WINDOWS
-  qtum_qt_sources += $(BITCOIN_RC)
+  qtum_loader_qt_sources += $(BITCOIN_RC)
 endif
-qtum_qt_ldadd = qt/libbitcoinqt.a
-qtum_qt_ldadd += $(LIBBITCOIN_UTIL) $(QT_LIBS) $(QT_DBUS_LIBS)
-qtum_qt_ldflags = $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
-qtum_qt_libtoolflags = $(AM_LIBTOOLFLAGS) --tag CXX
+qtum_loader_qt_ldadd = qt/libbitcoinqt.a
+qtum_loader_qt_ldadd += $(LIBBITCOIN_UTIL) $(QT_LIBS) $(QT_DBUS_LIBS)
+qtum_loader_qt_ldflags = $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+qtum_loader_qt_libtoolflags = $(AM_LIBTOOLFLAGS) --tag CXX
 
-qt_qtum_qt_CPPFLAGS = $(qtum_qt_cppflags)
-qt_qtum_qt_CXXFLAGS = $(qtum_qt_cxxflags)
-qt_qtum_qt_SOURCES = $(qtum_qt_sources)
-qt_qtum_qt_LDADD = $(qtum_qt_ldadd)
-qt_qtum_qt_LDFLAGS = $(qtum_qt_ldflags)
-qt_qtum_qt_LIBTOOLFLAGS = $(qtum_qt_libtoolflags)
-
-qtum_gui_CPPFLAGS = $(qtum_qt_cppflags)
-qtum_gui_CXXFLAGS = $(qtum_qt_cxxflags)
-qtum_gui_SOURCES = $(qtum_qt_sources)
-qtum_gui_LDADD = $(qtum_qt_ldadd)
-qtum_gui_LDFLAGS = $(qtum_qt_ldflags)
-qtum_gui_LIBTOOLFLAGS = $(qtum_qt_libtoolflags)
+qt_qtum_loader_qt_CPPFLAGS = $(qtum_loader_qt_cppflags)
+qt_qtum_loader_qt_CXXFLAGS = $(qtum_loader_qt_cxxflags)
+qt_qtum_loader_qt_SOURCES = $(qtum_loader_qt_sources)
+qt_qtum_loader_qt_LDADD = $(qtum_loader_qt_ldadd)
+qt_qtum_loader_qt_LDFLAGS = $(qtum_loader_qt_ldflags)
+qt_qtum_loader_qt_LIBTOOLFLAGS = $(qtum_loader_qt_libtoolflags)
 
 #locale/foo.ts -> locale/foo.qm
 QT_QM=$(QT_TS:.ts=.qm)
@@ -132,7 +124,7 @@ CLEAN_QT = $(nodist_qt_libbitcoinqt_a_SOURCES) $(QT_QM) $(QT_FORMS_H) qt/*.gcda 
 CLEANFILES += $(CLEAN_QT)
 
 bitcoin_qt_clean: FORCE
-	rm -f $(CLEAN_QT) $(qt_libbitcoinqt_a_OBJECTS) $(qt_qtum_qt_OBJECTS) qt/qtum_loader-qt$(EXEEXT) $(LIBBITCOINQT)
+	rm -f $(CLEAN_QT) $(qt_libbitcoinqt_a_OBJECTS) $(qt_qtum_loader_qt_OBJECTS) qt/qtum_loader-qt$(EXEEXT) $(LIBBITCOINQT)
 
 bitcoin_qt : qt/qtum_loader-qt$(EXEEXT)
 

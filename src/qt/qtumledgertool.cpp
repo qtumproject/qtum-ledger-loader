@@ -5,12 +5,18 @@
 #include <QStringList>
 #include <QByteArray>
 #include <QApplication>
+#include <QStandardPaths>
 
 #include <atomic>
 
 static const QString LOAD_FORMAT = ":/ledger/%1_load";
 static const QString DELETE_FORMAT = ":/ledger/%1_delete";
 static const QString RC_PATH_FORMAT = ":/ledger";
+
+QString GetDataDir()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+}
 
 class QtumLedgerToolPriv
 {
@@ -166,7 +172,7 @@ QString InstallDevice::parse(QString arg)
     arg = arg.remove("\"");
     if(arg.startsWith(RC_PATH_FORMAT))
     {
-        QString dataDir = QString::fromStdString(GetDataDir().string());
+        QString dataDir = GetDataDir();
         QFile fileIn(arg);
         if(fileIn.open(QIODevice::ReadOnly))
         {
