@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QApplication>
 #include <QStandardPaths>
+#include <QDir>
 
 #include <atomic>
 
@@ -15,7 +16,13 @@ static const QString RC_PATH_FORMAT = ":/ledger";
 
 QString GetDataDir()
 {
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir d{path};
+    if(d.mkpath(d.absolutePath()))
+    {
+        return d.absolutePath();
+    }
+    return "";
 }
 
 class QtumLedgerToolPriv
@@ -192,6 +199,10 @@ QString InstallDevice::parse(QString arg)
 
 bool QtumLedgerTool::installApp(InstallDevice::DeviceType type)
 {
+    // Check data dir
+    if(!checkDataDir())
+        return false;
+
     // Install Qtum App to ledger
     InstallDevice device(type);
     QString program;
@@ -213,6 +224,10 @@ bool QtumLedgerTool::installApp(InstallDevice::DeviceType type)
 
 bool QtumLedgerTool::removeApp(InstallDevice::DeviceType type)
 {
+    // Check data dir
+    if(!checkDataDir())
+        return false;
+
     // Remove Qtum App from ledger
     InstallDevice device(type);
     QString program;
@@ -230,4 +245,14 @@ bool QtumLedgerTool::removeApp(InstallDevice::DeviceType type)
     }
 
     return ret;
+}
+
+bool QtumLedgerTool::checkDataDir()
+{
+    if(GetDataDir().isEmpty())
+    {
+        d->strError = tr("Fail to create temporary data directory on disk");
+        return false;
+    }
+    return true;
 }

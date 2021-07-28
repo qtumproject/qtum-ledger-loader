@@ -108,6 +108,7 @@ public Q_SLOTS:
 private:
     bool isStarted();
     void wait();
+    bool checkDataDir();
 
     QtumLedgerToolPriv* d;
 };

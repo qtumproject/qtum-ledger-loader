@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <qt/loader.h>
+#include <qt/qtumledgerinstallerdialog.h>
+#include <QApplication>
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -17,5 +19,15 @@ Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 
 int GuiMain(int argc, char* argv[])
 {
-    return 0;
+    Q_INIT_RESOURCE(qtum);
+    // Generate high-dpi pixmaps
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if QT_VERSION >= 0x050600
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+    QApplication a(argc, argv);
+    QtumLedgerInstallerDialog w;
+    w.show();
+
+    return a.exec();
 }
