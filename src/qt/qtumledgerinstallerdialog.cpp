@@ -50,10 +50,6 @@ void QtumLedgerInstallerDialog::on_addButton_clicked()
     {
         QMessageBox::warning(this, tr("Install problem"), message);
     }
-    else
-    {
-        QDialog::accept();
-    }
 }
 
 void QtumLedgerInstallerDialog::on_removeButton_clicked()
@@ -69,10 +65,6 @@ void QtumLedgerInstallerDialog::on_removeButton_clicked()
     if(!d->ret && parseErrorMessage(message))
     {
         QMessageBox::warning(this, tr("Remove problem"), message);
-    }
-    else
-    {
-        QDialog::accept();
     }
 }
 
