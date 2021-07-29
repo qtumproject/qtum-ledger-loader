@@ -6,10 +6,6 @@
 
 class QtumLedgerInstallerDialogPriv;
 
-namespace Ui {
-class QtumLedgerInstallerDialog;
-}
-
 class QtumLedgerInstallerDialog : public QDialog
 {
     Q_OBJECT
@@ -29,7 +25,6 @@ protected:
     bool parseErrorMessage(QString& message);
 
 private:
-    Ui::QtumLedgerInstallerDialog *ui;
     QtumLedgerInstallerDialogPriv *d;
 };
 

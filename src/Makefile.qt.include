@@ -6,8 +6,7 @@ bin_PROGRAMS += qt/qtum_loader-qt
 
 EXTRA_LIBRARIES += qt/libbitcoinqt.a
 
-QT_FORMS_UI = \
-  qt/forms/qtumledgerinstallerdialog.ui
+QT_FORMS_UI = 
 
 QT_MOC_CPP = \
   qt/moc_qtumledgerinstallerdialog.cpp \
