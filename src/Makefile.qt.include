@@ -11,6 +11,7 @@ QT_FORMS_UI =
 QT_MOC_CPP = \
   qt/moc_qtumledgerinstallerdialog.cpp \
   qt/moc_qtumledgertool.cpp \
+  qt/moc_qtumversionchecker.cpp \
   qt/moc_waitmessagebox.cpp
 
 BITCOIN_MM = 
@@ -23,8 +24,9 @@ QT_QRC = qt/qtum.qrc
 BITCOIN_QT_H = \
   qt/loader.h \
   qt/qtumledgerinstallerdialog.h \
-  qt/waitmessagebox.h \
   qt/qtumledgertool.h \
+  qt/qtumversionchecker.h \
+  qt/waitmessagebox.h \
   qt/styleSheet.h
 
 RES_ICONS = \
@@ -36,6 +38,7 @@ BITCOIN_QT_BASE_CPP = \
   qt/loader.cpp \
   qt/qtumledgertool.cpp \
   qt/qtumledgerinstallerdialog.cpp \
+  qt/qtumversionchecker.cpp \
   qt/waitmessagebox.cpp \
   qt/styleSheet.cpp
 
