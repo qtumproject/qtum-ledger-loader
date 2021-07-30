@@ -24,7 +24,8 @@ BITCOIN_QT_H = \
   qt/loader.h \
   qt/qtumledgerinstallerdialog.h \
   qt/waitmessagebox.h \
-  qt/qtumledgertool.h
+  qt/qtumledgertool.h \
+  qt/styleSheet.h
 
 RES_ICONS = \
   qt/res/icons/bitcoin.ico \
@@ -35,7 +36,8 @@ BITCOIN_QT_BASE_CPP = \
   qt/loader.cpp \
   qt/qtumledgertool.cpp \
   qt/qtumledgerinstallerdialog.cpp \
-  qt/waitmessagebox.cpp
+  qt/waitmessagebox.cpp \
+  qt/styleSheet.cpp
 
 BITCOIN_QT_WINDOWS_CPP = 
 
@@ -46,6 +48,7 @@ BITCOIN_QT_CPP += $(BITCOIN_QT_WINDOWS_CPP)
 endif
 
 RES_STYLES = qt/res/styles/theme1/app.css \
+qt/res/styles/theme1/config.ini \
 qt/res/styles/theme1/app-icons/up_arrow.png \
 qt/res/styles/theme1/app-icons/up_arrow_hover.png \
 qt/res/styles/theme1/app-icons/up_arrow_disabled.png \

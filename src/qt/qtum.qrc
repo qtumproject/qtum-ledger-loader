@@ -18,6 +18,7 @@
     </qresource>
     <qresource prefix="/styles/theme1">
         <file alias="app">res/styles/theme1/app.css</file>
+        <file alias="config">res/styles/theme1/config.ini</file>
     </qresource>
     <qresource prefix="/styles/theme1/app-icons">
         <file alias="up_arrow">res/styles/theme1/app-icons/up_arrow.png</file>

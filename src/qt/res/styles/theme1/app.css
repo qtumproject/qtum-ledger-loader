@@ -4,6 +4,21 @@ Widget CSS
 QWidget{
     outline: none;
 }
+/*--------------------------------------------
+Main Window CSS
+--------------------------------------------*/
+QDialog .QFrame{
+    border: 1px solid transparent;
+}
+QDialog{
+    background-color: #f2f7fd;
+}
+QLabel{
+    color: #6b80af;
+}
+QLabel::disabled{
+    color: rgba(107, 128, 175, 20%);
+}
 /*-------------------------------------------- 
 Line Edit CSS
 --------------------------------------------*/

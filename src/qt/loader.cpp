@@ -5,6 +5,7 @@
 #include <qt/loader.h>
 #include <qt/qtumledgerinstallerdialog.h>
 #include <QApplication>
+#include <qt/styleSheet.h>
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -25,9 +26,10 @@ int GuiMain(int argc, char* argv[])
 #if QT_VERSION >= 0x050600
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    SetObjectStyleSheet(&app, StyleSheetNames::App);
     QtumLedgerInstallerDialog w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }
