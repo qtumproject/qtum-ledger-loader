@@ -17,8 +17,9 @@ public:
 private Q_SLOTS:
     void on_addButton_clicked();
     void on_removeButton_clicked();
-    void on_cancelButton_clicked();
+    void on_updateCheckBox_clicked(bool checked);
     void on_cbLedgerApp_currentIndexChanged(int index);
+    void checkForUpdates();
 
 protected:
     InstallDevice::DeviceType getDeviceType();

@@ -1,5 +1,6 @@
 #include <qt/qtumledgerinstallerdialog.h>
 #include <qt/waitmessagebox.h>
+#include <qt/qtumversionchecker.h>
 
 #include <QVariant>
 #include <QMessageBox>
@@ -14,6 +15,11 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QCheckBox>
+#include <QSettings>
+#include <QTimer>
+
+static const bool DEFAULT_CHECK_FOR_UPDATES = true;
 
 class QtumLedgerInstallerDialogPriv
 {
@@ -40,7 +46,7 @@ public:
     QPushButton *addButton;
     QPushButton *removeButton;
     QSpacerItem *horizontalSpacer;
-    QPushButton *cancelButton;
+    QCheckBox *updateCheckBox;
 
 private:
     void setupUi(QDialog *parentWidget)
@@ -115,10 +121,11 @@ private:
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
-        cancelButton = new QPushButton(buttonsContainerWhite);
-        cancelButton->setObjectName(QStringLiteral("cancelButton"));
+        updateCheckBox = new QCheckBox(buttonsContainerWhite);
+        updateCheckBox->setChecked(DEFAULT_CHECK_FOR_UPDATES);
+        updateCheckBox->setObjectName(QStringLiteral("updateCheckBox"));
 
-        horizontalLayout_2->addWidget(cancelButton);
+        horizontalLayout_2->addWidget(updateCheckBox);
         verticalLayout_2->addWidget(buttonsContainerWhite);
 
         QMetaObject::connectSlotsByName(parentWidget);
@@ -136,10 +143,20 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     d->labelApp->setText(QString());
     d->addButton->setText(tr("Install"));
     d->removeButton->setText(tr("Remove"));
-    d->cancelButton->setText(tr("Cancel"));
+    d->updateCheckBox->setText(tr("Check for updates"));
     d->cbLedgerApp->addItem(tr("Qtum Wallet Nano S"), InstallDevice::WalletNanoS);
     d->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
     d->labelApp->setStyleSheet("QLabel { color: red; }");
+
+    QSettings settings;
+    if (!settings.contains("fCheckForUpdates"))
+        settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
+    bool fCheckForUpdates = settings.value("fCheckForUpdates").toBool();
+    d->updateCheckBox->setChecked(fCheckForUpdates);
+    if(fCheckForUpdates)
+    {
+        QTimer::singleShot(1000, this, SLOT(checkForUpdates()));
+    }
 }
 
 QtumLedgerInstallerDialog::~QtumLedgerInstallerDialog()
@@ -179,9 +196,10 @@ void QtumLedgerInstallerDialog::on_removeButton_clicked()
     }
 }
 
-void QtumLedgerInstallerDialog::on_cancelButton_clicked()
+void QtumLedgerInstallerDialog::on_updateCheckBox_clicked(bool checked)
 {
-    QDialog::reject();
+    QSettings settings;
+    settings.setValue("fCheckForUpdates", checked);
 }
 
 InstallDevice::DeviceType QtumLedgerInstallerDialog::getDeviceType()
@@ -241,5 +259,17 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
                                         "Nano S > Settings > Security > Auto-lock > 10 minutes\n"));
     default:
         break;
+    }
+}
+
+void QtumLedgerInstallerDialog::checkForUpdates()
+{
+    // Check for updates
+    QtumVersionChecker qtumVersionChecker(this);
+    if(qtumVersionChecker.newVersionAvailable())
+    {
+        QString link = QString("<a href=%1>%2</a>").arg(QTUM_RELEASES, QTUM_RELEASES);
+        QString message(tr("New version of Qtum ledger application loader is available on the Qtum source code repository: <br /> %1. <br />It is recommended to download it and update this application").arg(link));
+        QMessageBox::information(this, tr("Check for updates"), message);
     }
 }
