@@ -23,15 +23,15 @@ packages:
 - "ca-certificates"
 - "python3"
 remotes:
-- "url": "https://github.com/qtumproject/qtum.git"
-  "dir": "qtum"
+- "url": "https://github.com/qtumproject/qtum-ledger-loader.git"
+  "dir": "qtum-ledger-loader"
 files: []
 script: |
   set -e -o pipefail
 
   WRAP_DIR=$HOME/wrapped
   HOSTS="x86_64-w64-mingw32"
-  CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-gui-tests"
+  CONFIGFLAGS="--enable-reduce-exports"
   FAKETIME_HOST_PROGS="ar ranlib nm windres strip objcopy"
   FAKETIME_PROGS="date makensis zip"
   HOST_CFLAGS="-O2 -g -fno-ident"
@@ -94,7 +94,7 @@ script: |
   create_per-host_compiler_wrapper "2000-01-01 12:00:00"
   export PATH=${WRAP_DIR}:${PATH}
 
-  cd qtum
+  cd qtum-ledger-loader
   BASEPREFIX="${PWD}/depends"
   # Build dependencies for each host
   for i in $HOSTS; do

@@ -15,7 +15,7 @@ remotes:
   "dir": "signapple"
   "commit": "b084cbbf44d5330448ffce0c7d118f75781b64bd"
 files:
-- "qtum-osx-unsigned.tar.gz"
+- "qtum-loader-osx-unsigned.tar.gz"
 script: |
   set -e -o pipefail
 
@@ -41,9 +41,9 @@ script: |
   export PATH="$HOME/.local/bin":$PATH
   cd ..
 
-  UNSIGNED_TARBALL=qtum-osx-unsigned.tar.gz
-  UNSIGNED_APP=dist/Qtum-Qt.app
-  SIGNED=qtum-osx-signed.dmg
+  UNSIGNED_TARBALL=qtum-loader-osx-unsigned.tar.gz
+  UNSIGNED_APP=dist/QtumLoader-Qt.app
+  SIGNED=qtum-loader-osx-signed.dmg
 
   tar -xf ${UNSIGNED_TARBALL}
   OSX_VOLNAME="$(cat osx_volname)"
