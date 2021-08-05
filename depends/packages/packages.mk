@@ -1,8 +1,8 @@
-packages:=boost openssl libevent gmp
+packages:=
 
 qt_packages = zlib
 
-qrencode_packages = qrencode
+qrencode_packages = 
 
 qt_linux_packages:=qt expat libxcb xcb_proto libXau xproto freetype fontconfig
 qt_android_packages=qt
@@ -10,15 +10,15 @@ qt_android_packages=qt
 qt_darwin_packages=qt
 qt_mingw32_packages=qt
 
-bdb_packages=bdb
-sqlite_packages=sqlite
+bdb_packages=
+sqlite_packages=
 
-zmq_packages=zeromq
+zmq_packages=
 
-upnp_packages=miniupnpc
+upnp_packages=
 
-multiprocess_packages = libmultiprocess capnp
-multiprocess_native_packages = native_libmultiprocess native_capnp
+multiprocess_packages = 
+multiprocess_native_packages = 
 
 darwin_native_packages = native_biplist native_ds_store native_mac_alias
 

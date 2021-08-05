@@ -93,24 +93,10 @@ The following can be set when running make: `make FOO=bar`
 <dd>If a source file can't be fetched, try here before giving up</dd>
 <dt>NO_QT</dt>
 <dd>Don't download/build/cache qt and its dependencies</dd>
-<dt>NO_QR</dt>
-<dd>Don't download/build/cache packages needed for enabling qrencode</dd>
-<dt>NO_ZMQ</dt>
-<dd>Don't download/build/cache packages needed for enabling zeromq</dd>
-<dt>NO_WALLET</dt>
-<dd>Don't download/build/cache libs needed to enable the wallet</dd>
-<dt>NO_BDB</dt>
-<dd>Don't download/build/cache BerkeleyDB</dd>
-<dt>NO_SQLITE</dt>
-<dd>Don't download/build/cache SQLite</dd>
-<dt>NO_UPNP</dt>
-<dd>Don't download/build/cache packages needed for enabling upnp</dd>
 <dt>ALLOW_HOST_PACKAGES</dt>
 <dd>Packages that are missed in dependencies (due to `NO_*` option or
 build script logic) are searched for among the host system packages using
 `pkg-config`. It allows building with packages of other (newer) versions</dd>
-<dt>MULTIPROCESS</dt>
-<dd>build libmultiprocess (experimental, requires cmake)</dd>
 <dt>DEBUG</dt>
 <dd>disable some optimizations and enable more runtime checking</dd>
 <dt>HOST_ID_SALT</dt>
