@@ -1,5 +1,5 @@
 ---
-name: "qtum-core-linux-0.21"
+name: "qtum-ledger-linux-0.21"
 enable_cache: true
 distro: "ubuntu"
 suites:
