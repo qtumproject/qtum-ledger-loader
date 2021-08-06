@@ -135,7 +135,7 @@ private:
 QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     QDialog(parent)
 {
-    setWindowTitle(tr("Qtum app ledger installer"));
+    setWindowTitle(tr("Qtum ledger application loader"));
 
     d = new QtumLedgerInstallerDialogPriv(this);
     d->labelTitle->setText(tr("Install or remove QTUM app from ledger."));
