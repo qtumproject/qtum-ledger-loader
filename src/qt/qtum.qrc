@@ -48,5 +48,9 @@
         <file alias="cb_up_down_arrow">res/styles/theme1/app-icons/cb_up_down_arrow.png</file>
         <file alias="right_arrow">res/styles/theme1/app-icons/right_arrow.png</file>
         <file alias="down_arrow_unit">res/styles/theme1/app-icons/down_arrow_unit.png</file>
+        <file alias="message_critical">res/styles/theme1/app-icons/message_critical.png</file>
+        <file alias="message_info">res/styles/theme1/app-icons/message_info.png</file>
+        <file alias="message_warning">res/styles/theme1/app-icons/message_warning.png</file>
+        <file alias="message_question">res/styles/theme1/app-icons/message_question.png</file>
     </qresource>
 </RCC>

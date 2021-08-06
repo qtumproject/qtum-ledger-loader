@@ -81,7 +81,11 @@ qt/res/styles/theme1/app-icons/slider_switcher_disabled.png \
 qt/res/styles/theme1/app-icons/slider_switcher_hover.png \
 qt/res/styles/theme1/app-icons/cb_up_down_arrow.png \
 qt/res/styles/theme1/app-icons/right_arrow.png \
-qt/res/styles/theme1/app-icons/down_arrow_unit.png
+qt/res/styles/theme1/app-icons/down_arrow_unit.png \
+qt/res/styles/theme1/app-icons/message_critical.png \
+qt/res/styles/theme1/app-icons/message_warning.png \
+qt/res/styles/theme1/app-icons/message_info.png \
+qt/res/styles/theme1/app-icons/message_question.png
 
 RES_LEDGER = qt/res/ledger/nanos_app.hex \
 qt/res/ledger/nanos_load.txt \
