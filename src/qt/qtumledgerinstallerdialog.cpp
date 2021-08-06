@@ -174,10 +174,15 @@ void QtumLedgerInstallerDialog::on_addButton_clicked()
     dlg.exec();
 
     QString message;
-    if(!d->ret && parseErrorMessage(message))
+    bool dependency = false;
+    if(!d->ret && parseErrorMessage(message, dependency))
     {
-        QMessageBox::warning(this, tr("Install problem"), message);
+        QString title = getDeviceAppTitle(true);
+        QMessageBox::warning(this, title, message);
     }
+
+    if(dependency)
+        installDependency();
 }
 
 void QtumLedgerInstallerDialog::on_removeButton_clicked()
@@ -190,10 +195,15 @@ void QtumLedgerInstallerDialog::on_removeButton_clicked()
     dlg.exec();
 
     QString message;
-    if(!d->ret && parseErrorMessage(message))
+    bool dependency = false;
+    if(!d->ret && parseErrorMessage(message, dependency))
     {
-        QMessageBox::warning(this, tr("Remove problem"), message);
+        QString title = getDeviceAppTitle(false);
+        QMessageBox::warning(this, title, message);
     }
+
+    if(dependency)
+        installDependency();
 }
 
 void QtumLedgerInstallerDialog::on_updateCheckBox_clicked(bool checked)
@@ -217,15 +227,17 @@ InstallDevice::DeviceType QtumLedgerInstallerDialog::getDeviceType()
     return InstallDevice::WalletNanoS;
 }
 
-bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message)
+bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message, bool& dependency)
 {
+    dependency = false;
     QString errorMessage = d->tool->errorMessage();
     if(errorMessage.contains("denied by the user", Qt::CaseInsensitive))
         return false;
 
     if(errorMessage.contains("ModuleNotFoundError", Qt::CaseInsensitive) && errorMessage.contains("ledgerblue", Qt::CaseInsensitive))
     {
-        message = tr("Ledger loader not found, you can install it with the command:") + "\npip3 install ledgerblue";
+        message = tr("Module ledgerblue not found, you can install it manually with the command:") + "\n" + DEPENDENCY_INSTALL_CMD;
+        dependency = true;
         return true;
     }
 
@@ -272,4 +284,33 @@ void QtumLedgerInstallerDialog::checkForUpdates()
         QString message(tr("New version of Qtum ledger application loader is available on the Qtum source code repository: <br /> %1. <br />It is recommended to download it and update this application").arg(link));
         QMessageBox::information(this, tr("Check for updates"), message);
     }
+}
+
+void QtumLedgerInstallerDialog::installDependency()
+{
+    QString message = tr("Would you like to install module ledgerblue now?");
+    QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Install missing module"), message,
+        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+
+    if(retval == QMessageBox::Yes)
+    {
+        // Remove Qtum app from ledger
+        WaitMessageBox dlg(tr("Missing module"), tr("Installing module ledgerblue..."), [this]() {
+            d->ret = d->tool->installDependency();
+        }, this);
+
+        dlg.exec();
+
+        if(!d->ret)
+        {
+            QMessageBox::warning(this, tr("Missing module"), tr("Fail to install module ledgerblue"));
+        }
+    }
+}
+
+QString QtumLedgerInstallerDialog::getDeviceAppTitle(bool install)
+{
+    if(install)
+        return getDeviceType() == InstallDevice::WalletNanoS ? tr("Qtum Wallet install problem") : tr("Qtum Stake install problem");
+    return getDeviceType() == InstallDevice::WalletNanoS ? tr("Qtum Wallet remove problem") : tr("Qtum Stake remove problem");
 }

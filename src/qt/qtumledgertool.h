@@ -7,6 +7,9 @@
 class QtumLedgerToolPriv;
 class InstallDevicePriv;
 
+static const QString DEPENDENCY_INSTALL_CMD = "pip3 install ledgerblue";
+static const QString DEPENDENCY_SHOW_CMD = "pip3 show ledgerblue";
+
 /**
  * @brief The InstallDevice class Install Qtum app to device
  */
@@ -100,6 +103,12 @@ public:
      * @return Last error message
      */
     QString errorMessage();
+
+    /**
+     * @brief installDependency Install ledgerblue loader
+     * @return success of the operation
+     */
+    bool installDependency();
 
 Q_SIGNALS:
 

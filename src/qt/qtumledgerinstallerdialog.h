@@ -23,7 +23,9 @@ private Q_SLOTS:
 
 protected:
     InstallDevice::DeviceType getDeviceType();
-    bool parseErrorMessage(QString& message);
+    QString getDeviceAppTitle(bool install);
+    bool parseErrorMessage(QString& message, bool& dependency);
+    void installDependency();
 
 private:
     QtumLedgerInstallerDialogPriv *d;

@@ -256,3 +256,31 @@ bool QtumLedgerTool::checkDataDir()
     }
     return true;
 }
+
+bool QtumLedgerTool::installDependency()
+{
+    // Install dependencies
+    bool ret = true;
+    QStringList arguments = DEPENDENCY_INSTALL_CMD.split(" ");
+    QString program = arguments[0];
+    arguments.removeAt(0);
+    d->process.start(program, arguments);
+    d->fStarted = true;
+    wait();
+    ret &= QProcess::NormalExit == d->process.exitStatus();
+
+    // Check dependencies
+    if(ret)
+    {
+        arguments = DEPENDENCY_SHOW_CMD.split(" ");
+        program = arguments[0];
+        arguments.removeAt(0);
+        d->process.start(program, arguments);
+        d->fStarted = true;
+        wait();
+        ret &= QProcess::NormalExit == d->process.exitStatus();
+        ret &= d->strStdout.contains("ledgerblue");
+    }
+
+    return ret;
+}
