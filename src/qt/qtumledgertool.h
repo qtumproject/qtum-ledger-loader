@@ -7,7 +7,7 @@
 class QtumLedgerToolPriv;
 class InstallDevicePriv;
 
-static const QString DEPENDENCY_INSTALL_CMD = "pip3 install ledgerblue";
+static const QString DEPENDENCY_INSTALL_CMD = "pip3 install --user ledgerblue";
 static const QString DEPENDENCY_SHOW_CMD = "pip3 show ledgerblue";
 
 /**
