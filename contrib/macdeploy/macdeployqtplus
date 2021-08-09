@@ -639,7 +639,7 @@ else:
 
 # ------------------------------------------------
 
-target = os.path.join("dist", "Qtum-Qt.app")
+target = os.path.join("dist", "QtumLoader-Qt.app")
 
 if verbose >= 2:
     print("+ Copying source bundle +")
