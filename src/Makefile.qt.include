@@ -7,13 +7,15 @@ bin_PROGRAMS += qt/qtum_loader-qt
 EXTRA_LIBRARIES += qt/libbitcoinqt.a
 
 QT_FORMS_UI = \
-  qt/forms/qtumledgerinstallerdialog.ui
+  qt/forms/qtumledgerinstallerdialog.ui \
+  qt/forms/helpmessagedialog.ui
 
 QT_MOC_CPP = \
   qt/moc_qtumledgerinstallerdialog.cpp \
   qt/moc_qtumledgertool.cpp \
   qt/moc_qtumversionchecker.cpp \
-  qt/moc_waitmessagebox.cpp
+  qt/moc_waitmessagebox.cpp \
+  qt/moc_utilitydialog.cpp
 
 BITCOIN_MM = 
 
@@ -30,7 +32,9 @@ BITCOIN_QT_H = \
   qt/waitmessagebox.h \
   qt/guiconstants.h \
   qt/networkstyle.h \
-  qt/styleSheet.h
+  qt/styleSheet.h \
+  qt/utilitydialog.h \
+  qt/guiutil.h
 
 RES_ICONS = \
   qt/res/icons/bitcoin.ico \
@@ -44,7 +48,9 @@ BITCOIN_QT_BASE_CPP = \
   qt/qtumversionchecker.cpp \
   qt/waitmessagebox.cpp \
   qt/networkstyle.cpp \
-  qt/styleSheet.cpp
+  qt/styleSheet.cpp \
+  qt/utilitydialog.cpp \
+  qt/guiutil.cpp
 
 BITCOIN_QT_WINDOWS_CPP = 
 
