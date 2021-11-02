@@ -6,7 +6,8 @@ bin_PROGRAMS += qt/qtum_loader-qt
 
 EXTRA_LIBRARIES += qt/libbitcoinqt.a
 
-QT_FORMS_UI = 
+QT_FORMS_UI = \
+  qt/forms/qtumledgerinstallerdialog.ui
 
 QT_MOC_CPP = \
   qt/moc_qtumledgerinstallerdialog.cpp \
@@ -130,7 +131,7 @@ qtum_loader_qt_cppflags = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUD
   $(QT_INCLUDES) $(QR_CFLAGS)
 qtum_loader_qt_cxxflags = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
 
-qtum_loader_qt_sources = qt/main.cpp
+qtum_loader_qt_sources = qt/main.cpp $(nodist_qt_libbitcoinqt_a_SOURCES)
 if TARGET_WINDOWS
   qtum_loader_qt_sources += $(BITCOIN_RC)
 endif

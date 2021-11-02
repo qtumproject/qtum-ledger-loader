@@ -6,6 +6,10 @@
 
 class QtumLedgerInstallerDialogPriv;
 
+namespace Ui {
+class QtumLedgerInstallerDialog;
+}
+
 class QtumLedgerInstallerDialog : public QDialog
 {
     Q_OBJECT
@@ -28,6 +32,7 @@ protected:
     void installDependency();
 
 private:
+    Ui::QtumLedgerInstallerDialog *ui;
     QtumLedgerInstallerDialogPriv *d;
 };
 
