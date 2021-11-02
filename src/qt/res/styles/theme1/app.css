@@ -7,8 +7,30 @@ QWidget{
 /*--------------------------------------------
 Main Window CSS
 --------------------------------------------*/
+QMainWindow{
+    background-color: #f2f7fd;
+}
+QMainWindow .QFrame{
+    border: 1px solid transparent;
+}
 QDialog .QFrame{
     border: 1px solid transparent;
+}
+QMainWindow::separator {
+    width: 0px;
+    height: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+QFrame#hLine,
+#hLine2,
+#hLine3,
+#hLine4{
+    border-top: 1px solid transparent;
+}
+QFrame#vLine,
+#vLine2{
+    border-left: 1px solid transparent;
 }
 QDialog{
     background-color: #f2f7fd;
@@ -18,6 +40,9 @@ QLabel{
 }
 QLabel::disabled{
     color: rgba(107, 128, 175, 20%);
+}
+.QWidget#widget_header{
+    background-color: #e4ebf5;
 }
 /*-------------------------------------------- 
 Line Edit CSS

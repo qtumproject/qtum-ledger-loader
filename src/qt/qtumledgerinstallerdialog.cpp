@@ -1,12 +1,21 @@
+#if defined(HAVE_CONFIG_H)
+#include <config/bitcoin-config.h>
+#endif
+
 #include <qt/qtumledgerinstallerdialog.h>
 #include <qt/forms/ui_qtumledgerinstallerdialog.h>
 #include <qt/waitmessagebox.h>
 #include <qt/qtumversionchecker.h>
+#include <qt/utilitydialog.h>
+#include <clientversion.h>
 
 #include <QVariant>
 #include <QMessageBox>
 #include <QSettings>
 #include <QTimer>
+#include <QMenu>
+#include <QAction>
+#include <QMenuBar>
 
 static const bool DEFAULT_CHECK_FOR_UPDATES = true;
 
@@ -23,16 +32,23 @@ public:
 };
 
 QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
-    QDialog(parent),
+    QMainWindow(parent),
     ui(new Ui::QtumLedgerInstallerDialog)
 {
     ui->setupUi(this);
     d = new QtumLedgerInstallerDialogPriv(this);
 
+    QString title = windowTitle() + " " + QString::fromStdString(FormatFullVersion());
+    setWindowTitle(title);
+
     ui->cbLedgerApp->addItem(tr("Qtum Wallet Nano S"), InstallDevice::WalletNanoS);
     ui->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
 
     ui->labelApp->setStyleSheet("QLabel { color: red; }");
+
+    createActions();
+    createMenuBar();
+
     QSettings settings;
     if (!settings.contains("fCheckForUpdates"))
         settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
@@ -199,4 +215,51 @@ QString QtumLedgerInstallerDialog::getDeviceAppTitle(bool install)
     if(install)
         return getDeviceType() == InstallDevice::WalletNanoS ? tr("Qtum Wallet install problem") : tr("Qtum Stake install problem");
     return getDeviceType() == InstallDevice::WalletNanoS ? tr("Qtum Wallet remove problem") : tr("Qtum Stake remove problem");
+}
+
+void QtumLedgerInstallerDialog::createActions()
+{
+    showHelpMessageAction = new QAction(tr("&Command-line options"), this);
+    showHelpMessageAction->setMenuRole(QAction::NoRole);
+    showHelpMessageAction->setStatusTip(tr("Show the %1 help message to get a list with possible Qtum command-line options").arg(PACKAGE_NAME));
+    connect(showHelpMessageAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::showHelpMessageClicked);
+
+    aboutAction = new QAction(tr("&About %1").arg(PACKAGE_NAME), this);
+    aboutAction->setStatusTip(tr("Show information about %1").arg(PACKAGE_NAME));
+    aboutAction->setMenuRole(QAction::AboutRole);
+    connect(aboutAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::aboutClicked);
+
+    aboutQtAction = new QAction(tr("About &Qt"), this);
+    aboutQtAction->setStatusTip(tr("Show information about Qt"));
+    aboutQtAction->setMenuRole(QAction::AboutQtRole);
+    connect(aboutQtAction, &QAction::triggered, qApp, QApplication::aboutQt);
+}
+
+void QtumLedgerInstallerDialog::showHelpMessageClicked()
+{
+    HelpMessageDialog dlg(this, false);
+    dlg.exec();
+}
+
+void QtumLedgerInstallerDialog::aboutClicked()
+{
+    HelpMessageDialog dlg(this, true);
+    dlg.exec();
+}
+
+void QtumLedgerInstallerDialog::createMenuBar()
+{
+#ifdef Q_OS_MAC
+    // Create a decoupled menu bar on Mac which stays even if the window is closed
+    appMenuBar = new QMenuBar();
+#else
+    // Get the main window's menu bar on other platforms
+    appMenuBar = menuBar();
+#endif
+
+    QMenu *help = appMenuBar->addMenu(tr("&Help"));
+    help->addAction(showHelpMessageAction);
+    help->addSeparator();
+    help->addAction(aboutAction);
+    help->addAction(aboutQtAction);
 }

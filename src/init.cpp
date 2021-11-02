@@ -13,7 +13,7 @@
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/qtumproject/qtum>";
+    const std::string URL_SOURCE_CODE = "<https://github.com/qtumproject/qtum-ledger-loader>";
 
     return CopyrightHolders(strprintf("Copyright (C) %i", COPYRIGHT_YEAR) + " ") + "\n" +
            "\n" +
