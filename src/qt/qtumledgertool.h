@@ -110,6 +110,13 @@ public:
      */
     bool installDependency();
 
+    /**
+     * @brief infoApp
+     * @param type
+     * @return Ledger application information
+     */
+    QString infoApp(InstallDevice::DeviceType type);
+
 Q_SIGNALS:
 
 public Q_SLOTS:

@@ -7,12 +7,15 @@
 #include <QApplication>
 #include <QStandardPaths>
 #include <QDir>
+#include <QCryptographicHash>
+#include <QMap>
 
 #include <atomic>
 
 static const QString LOAD_FORMAT = ":/ledger/%1_load";
 static const QString DELETE_FORMAT = ":/ledger/%1_delete";
 static const QString RC_PATH_FORMAT = ":/ledger";
+static const char* INFO_APP_FORMAT = "App name:\t%1\nApp version:\t%2\nTarget version:\t%3\nSha256 hash:\t%4\nRoot private key:\t%5";
 
 QString GetDataDir()
 {
@@ -35,6 +38,7 @@ public:
     QProcess process;
     QString strStdout;
     QString strError;
+    QMap<InstallDevice::DeviceType, QString> info;
 };
 
 QtumLedgerTool::QtumLedgerTool(QObject *parent) : QObject(parent)
@@ -283,4 +287,90 @@ bool QtumLedgerTool::installDependency()
     }
 
     return ret;
+}
+
+QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
+{
+    // Check the list
+    if(d->info.contains(type))
+    {
+        return d->info[type];
+    }
+
+    // Parameters list
+    QString appName;
+    QString appVersion;
+    QString targetVersion;
+    QString fileHash;
+    QString rootPrivateKey;
+
+    // Get Qtum App info from arguments
+    InstallDevice device(type);
+    QString program;
+    QStringList arguments;
+    QString fileName;
+    bool ret = device.loadCommand(program, arguments);
+    if(ret)
+    {
+        for(int i = 0; i < arguments.size(); i++)
+        {
+            QString argument = arguments[i];
+            if(argument == "--appName")
+            {
+                i++;
+                if(i < arguments.size())
+                {
+                    appName = arguments[i];
+                }
+            }
+            else if(argument == "--appVersion")
+            {
+                i++;
+                if(i < arguments.size())
+                {
+                    appVersion = arguments[i];
+                }
+            }
+            else if(argument == "--fileName")
+            {
+                i++;
+                if(i < arguments.size())
+                {
+                    fileName = arguments[i];
+                }
+            }
+            else if(argument == "--rootPrivateKey")
+            {
+                i++;
+                if(i < arguments.size())
+                {
+                    rootPrivateKey = arguments[i];
+                }
+            }
+            else if(argument.startsWith("--targetVersion"))
+            {
+                QStringList target = argument.split("=");
+                if(target.size() > 1)
+                {
+                    targetVersion = target[1];
+                }
+            }
+        }
+    }
+
+    // Compute the hash
+    if(QFile::exists(fileName))
+    {
+        QFile fileIn(fileName);
+        if(fileIn.open(QIODevice::ReadOnly))
+        {
+            QByteArray data = fileIn.readAll();
+            fileHash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex();
+        }
+    }
+
+    // Add the info into the list
+    QString info = tr(INFO_APP_FORMAT).arg(appName, appVersion, targetVersion, fileHash, rootPrivateKey);
+    d->info[type] = info;
+    return info;
 }

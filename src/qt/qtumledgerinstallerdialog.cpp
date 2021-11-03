@@ -164,8 +164,10 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
     int deviceType = index;
     switch (deviceType) {
     case InstallDevice::WalletNanoS:
+        ui->labelInfo->setText(d->tool->infoApp(InstallDevice::WalletNanoS));
         return ui->labelApp->setText("");
     case InstallDevice::StakeNanoS:
+        ui->labelInfo->setText(d->tool->infoApp(InstallDevice::StakeNanoS));
         return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the auto lock:\n"
                                         "Nano S > Settings > Security > Auto-lock > OFF\n"
                                         "\n"
