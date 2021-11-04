@@ -58,8 +58,17 @@ public:
      */
     bool deleteCommand(QString &program, QStringList &arguments);
 
+    /**
+     * @brief firmwareCommand Get the firmware command
+     * @param program Program to start
+     * @param arguments Program arguments
+     * @return Success of the operation
+     */
+    bool firmwareCommand(QString &program, QStringList &arguments);
+
 private:
     bool getRCCommand(const QString &rcPath, QString &program, QStringList &arguments);
+    bool getCommand(const QString &command, QString &program, QStringList &arguments);
     QString parse(QString arg);
 
 private:
@@ -97,6 +106,13 @@ public:
      * @return success of the operation
      */
     bool removeApp(InstallDevice::DeviceType type);
+
+    /**
+     * @brief checkFirmware Check the firmware
+     * @param type Application for install
+     * @return whether or not the application can be installed on this firmware
+     */
+    bool checkFirmware(InstallDevice::DeviceType type);
 
     /**
      * @brief errorMessage Get the last error message

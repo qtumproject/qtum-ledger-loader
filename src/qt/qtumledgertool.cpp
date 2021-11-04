@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QCryptographicHash>
 #include <QMap>
+#include <QTextStream>
 
 #include <atomic>
 
@@ -16,6 +17,7 @@ static const QString LOAD_FORMAT = ":/ledger/%1_load";
 static const QString DELETE_FORMAT = ":/ledger/%1_delete";
 static const QString RC_PATH_FORMAT = ":/ledger";
 static const char* INFO_APP_FORMAT = "App name:\t%1\nApp version:\t%2\nTarget version:\t%3\nSha256 hash:\t%4\nRoot private key:\t%5";
+static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\nPlease update the ledger firmware to the most recent version.";
 
 QString GetDataDir()
 {
@@ -39,6 +41,7 @@ public:
     QString strStdout;
     QString strError;
     QMap<InstallDevice::DeviceType, QString> info;
+    QMap<InstallDevice::DeviceType, QString> target;
 };
 
 QtumLedgerTool::QtumLedgerTool(QObject *parent) : QObject(parent)
@@ -146,6 +149,12 @@ bool InstallDevice::deleteCommand(QString &program, QStringList &arguments)
     return getRCCommand(rcPath, program, arguments);
 }
 
+
+bool InstallDevice::firmwareCommand(QString &program, QStringList &arguments)
+{
+    QString command = "python3 -m ledgerblue.checkGenuine --targetId 0x31100004";
+    return getCommand(command, program, arguments);
+}
 bool InstallDevice::getRCCommand(const QString &rcPath, QString &program, QStringList &arguments)
 {
     // Get the command
@@ -160,6 +169,11 @@ bool InstallDevice::getRCCommand(const QString &rcPath, QString &program, QStrin
         return false;
     }
 
+    return getCommand(command, program, arguments);
+}
+
+bool InstallDevice::getCommand(const QString &command, QString &program, QStringList &arguments)
+{
     // Split to params
     arguments.clear();
     QStringList args = command.split(" ");
@@ -246,6 +260,141 @@ bool QtumLedgerTool::removeApp(InstallDevice::DeviceType type)
 
         ret &= QProcess::NormalExit == d->process.exitStatus();
         ret &= d->strError.isEmpty();
+    }
+
+    return ret;
+}
+
+bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type)
+{
+    // Check data dir
+    if(!checkDataDir())
+        return false;
+
+    // Install Qtum App to ledger
+    InstallDevice device(type);
+    QString program;
+    QStringList arguments;
+    bool ret = device.firmwareCommand(program, arguments);
+    if(ret)
+    {
+        d->process.start(program, arguments);
+        d->fStarted = true;
+
+        wait();
+
+        ret &= QProcess::NormalExit == d->process.exitStatus();
+        ret &= d->strError.isEmpty();
+
+        // Get app target
+        QString ledgerFirmware;
+        QString appTarget;
+        infoApp(type);
+        appTarget = d->target[type];
+
+        // Parse firmware version
+        QString line;
+        QTextStream stream(&d->strStdout);
+        while (stream.readLineInto(&line))
+        {
+            if(line.startsWith("SE Version"))
+            {
+                QStringList elements = line.split(" ");
+                if(elements.size() > 2)
+                {
+                    ledgerFirmware = elements[2].trimmed();
+                    break;
+                }
+            }
+        }
+
+        if(ret && ledgerFirmware.isEmpty())
+        {
+            ret = false;
+            d->strError = tr("Fail to get ledger firmware");
+        }
+
+        if(ret && appTarget.isEmpty())
+        {
+            ret = false;
+            d->strError = tr("Fail to get app target");
+        }
+
+        QList<int> firmwareVersion;
+        if(ret)
+        {
+            QStringList elementsFirmware = ledgerFirmware.split(".");
+            for(QString element : elementsFirmware)
+            {
+                bool ok = true;
+                int version = element.toInt(&ok);
+                if(ok)
+                {
+                    firmwareVersion.push_back(version);
+                }
+                else
+                {
+                    ret = false;
+                    d->strError = tr("Fail to parse firmware version: ") + ledgerFirmware;
+                    break;
+                }
+            }
+        }
+
+        QList<int> targetVersion;
+        if(ret)
+        {
+            QStringList elementsTarget = appTarget.split(".");
+            for(QString element : elementsTarget)
+            {
+                bool ok = true;
+                int version = element.toInt(&ok);
+                if(ok)
+                {
+                    targetVersion.push_back(version);
+                }
+                else
+                {
+                    ret = false;
+                    d->strError = tr("Fail to parse target version: ") + appTarget;
+                    break;
+                }
+            }
+        }
+
+        if(ret && firmwareVersion.size() < 2)
+        {
+            ret = false;
+            d->strError = tr("Firmware version not complete: ") + ledgerFirmware;
+        }
+
+        if(ret && targetVersion.size() < 2)
+        {
+            ret = false;
+            d->strError = tr("Target version not complete: ") + appTarget;
+        }
+
+        // Check firmware version
+        if(ret)
+        {
+            bool needUpdate = false;
+            if(firmwareVersion[0] < targetVersion[0])
+            {
+                needUpdate = true;
+            }
+
+            if(firmwareVersion[0] == targetVersion[0] &&
+                    firmwareVersion[1] < targetVersion[1])
+            {
+                needUpdate = true;
+            }
+
+            if(needUpdate)
+            {
+                ret = false;
+                d->strError = tr(UPDATE_FIRMWARE_FORMAT).arg(ledgerFirmware, appTarget);
+            }
+        }
     }
 
     return ret;
@@ -372,5 +521,6 @@ QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
     // Add the info into the list
     QString info = tr(INFO_APP_FORMAT).arg(appName, appVersion, targetVersion, fileHash, rootPrivateKey);
     d->info[type] = info;
+    d->target[type] = targetVersion;
     return info;
 }
