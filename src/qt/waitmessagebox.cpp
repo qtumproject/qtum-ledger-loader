@@ -17,7 +17,7 @@ WaitMessageBox::WaitMessageBox(const QString &title, const QString &content, std
     mainLay->addWidget(lbl);
     run = _run;
 
-    QTimer::singleShot(100, this, SLOT(timeout()));
+    QTimer::singleShot(300, this, SLOT(timeout()));
 }
 
 void WaitMessageBox::timeout()

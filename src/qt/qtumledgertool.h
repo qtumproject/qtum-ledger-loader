@@ -123,9 +123,10 @@ public:
     /**
      * @brief checkFirmware Check the firmware
      * @param type Application for install
+     * @param message Firmware check message
      * @return whether or not the application can be installed on this firmware
      */
-    bool checkFirmware(InstallDevice::DeviceType type);
+    bool checkFirmware(InstallDevice::DeviceType type, QString& message);
 
     /**
      * @brief errorMessage Get the last error message
@@ -154,6 +155,7 @@ private:
     bool isStarted();
     void wait();
     bool checkDataDir();
+    QString firmwareMessage(InstallDevice::DeviceType type);
 
     QtumLedgerToolPriv* d;
 };

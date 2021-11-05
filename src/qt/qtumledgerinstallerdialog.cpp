@@ -29,6 +29,7 @@ public:
 
     QtumLedgerTool* tool = 0;
     bool ret = false;
+    QString message;
 };
 
 QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
@@ -68,14 +69,20 @@ QtumLedgerInstallerDialog::~QtumLedgerInstallerDialog()
 
 void QtumLedgerInstallerDialog::on_addButton_clicked()
 {
-    // Install Qtum app from ledger
-    WaitMessageBox dlg(tr("Ledger Status"), installInfo(getDeviceType()), [this]() {
-        d->ret = d->tool->installApp(getDeviceType());
-    }, this);
-
-    dlg.exec();
-
     QString message;
+    if(checkFirmware(message))
+    {
+        if(message.isEmpty())
+        {
+            installApp();
+        }
+        else
+        {
+            QString title = getDeviceAppTitle(true);
+            QMessageBox::warning(this, title, message);
+        }
+    }
+
     bool dependency = false;
     if(!d->ret && parseErrorMessage(message, dependency))
     {
@@ -133,7 +140,8 @@ bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message, bool& depend
 {
     dependency = false;
     QString errorMessage = d->tool->errorMessage();
-    if(errorMessage.contains("denied by the user", Qt::CaseInsensitive))
+    if(errorMessage.contains("denied by the user", Qt::CaseInsensitive) ||
+            errorMessage.contains("Invalid status 5501", Qt::CaseInsensitive))
         return false;
 
     if(errorMessage.contains("ModuleNotFoundError", Qt::CaseInsensitive) && errorMessage.contains("ledgerblue", Qt::CaseInsensitive))
@@ -301,7 +309,31 @@ QString QtumLedgerInstallerDialog::appInfo(InstallDevice::DeviceType type)
 QString QtumLedgerInstallerDialog::firmwareInfo()
 {
     QString message = tr("Allow reading firmware information from your Ledger device...\n\n");
-    message += "Random public key\n";
+    message += "Public key (random)\n";
     message += "Allow manager\n";
     return message;
+}
+
+bool QtumLedgerInstallerDialog::installApp()
+{
+    // Install Qtum app from ledger
+    WaitMessageBox dlg(tr("Ledger Status"), installInfo(getDeviceType()), [this]() {
+        d->ret = d->tool->installApp(getDeviceType());
+    }, this);
+
+    dlg.exec();
+    return d->ret;
+}
+
+bool QtumLedgerInstallerDialog::checkFirmware(QString &message)
+{
+    // Check ledger firmware
+    d->message.clear();
+    WaitMessageBox dlg(tr("Ledger Status"), firmwareInfo(), [this]() {
+        d->ret = d->tool->checkFirmware(getDeviceType(), d->message);
+    }, this);
+
+    dlg.exec();
+    message = d->message;
+    return d->ret;
 }

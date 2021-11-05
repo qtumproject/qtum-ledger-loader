@@ -17,7 +17,7 @@ static const QString LOAD_FORMAT = ":/ledger/%1_load";
 static const QString DELETE_FORMAT = ":/ledger/%1_delete";
 static const QString ID_FORMAT = ":/ledger/%1_app_id";
 static const QString RC_PATH_FORMAT = ":/ledger";
-static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\nPlease update the ledger firmware to the most recent version.";
+static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\n\nPlease update the ledger firmware to the most recent version.";
 
 QString GetDataDir()
 {
@@ -264,7 +264,7 @@ bool QtumLedgerTool::removeApp(InstallDevice::DeviceType type)
     return ret;
 }
 
-bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type)
+bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type, QString& message)
 {
     // Check data dir
     if(!checkDataDir())
@@ -285,117 +285,106 @@ bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type)
         ret &= QProcess::NormalExit == d->process.exitStatus();
         ret &= d->strError.isEmpty();
 
-        // Get app target
-        QString ledgerFirmware;
-        LedgerAppInfo info = appInfo(type);
-        QString appTarget = info.targetVersion;
+        message = firmwareMessage(type);
+    }
 
-        // Parse firmware version
-        QString line;
-        QTextStream stream(&d->strStdout);
-        while (stream.readLineInto(&line))
+    return ret;
+}
+
+QString QtumLedgerTool::firmwareMessage(InstallDevice::DeviceType type)
+{
+    // Get app target
+    QString ledgerFirmware;
+    LedgerAppInfo info = appInfo(type);
+    QString appTarget = info.targetVersion;
+
+    // Parse firmware version
+    QString line;
+    QTextStream stream(&d->strStdout);
+    while (stream.readLineInto(&line))
+    {
+        if(line.startsWith("SE Version"))
         {
-            if(line.startsWith("SE Version"))
+            QStringList elements = line.split(" ");
+            if(elements.size() > 2)
             {
-                QStringList elements = line.split(" ");
-                if(elements.size() > 2)
-                {
-                    ledgerFirmware = elements[2].trimmed();
-                    break;
-                }
-            }
-        }
-
-        if(ret && ledgerFirmware.isEmpty())
-        {
-            ret = false;
-            d->strError = tr("Fail to get ledger firmware");
-        }
-
-        if(ret && appTarget.isEmpty())
-        {
-            ret = false;
-            d->strError = tr("Fail to get app target");
-        }
-
-        QList<int> firmwareVersion;
-        if(ret)
-        {
-            QStringList elementsFirmware = ledgerFirmware.split(".");
-            for(QString element : elementsFirmware)
-            {
-                bool ok = true;
-                int version = element.toInt(&ok);
-                if(ok)
-                {
-                    firmwareVersion.push_back(version);
-                }
-                else
-                {
-                    ret = false;
-                    d->strError = tr("Fail to parse firmware version: ") + ledgerFirmware;
-                    break;
-                }
-            }
-        }
-
-        QList<int> targetVersion;
-        if(ret)
-        {
-            QStringList elementsTarget = appTarget.split(".");
-            for(QString element : elementsTarget)
-            {
-                bool ok = true;
-                int version = element.toInt(&ok);
-                if(ok)
-                {
-                    targetVersion.push_back(version);
-                }
-                else
-                {
-                    ret = false;
-                    d->strError = tr("Fail to parse target version: ") + appTarget;
-                    break;
-                }
-            }
-        }
-
-        if(ret && firmwareVersion.size() < 2)
-        {
-            ret = false;
-            d->strError = tr("Firmware version not complete: ") + ledgerFirmware;
-        }
-
-        if(ret && targetVersion.size() < 2)
-        {
-            ret = false;
-            d->strError = tr("Target version not complete: ") + appTarget;
-        }
-
-        // Check firmware version
-        if(ret)
-        {
-            bool needUpdate = false;
-            if(firmwareVersion[0] < targetVersion[0])
-            {
-                needUpdate = true;
-            }
-
-            if(firmwareVersion[0] == targetVersion[0] &&
-                    firmwareVersion[1] < targetVersion[1])
-            {
-                needUpdate = true;
-            }
-
-            if(needUpdate)
-            {
-                ret = false;
-                d->strError = tr(UPDATE_FIRMWARE_FORMAT).arg(ledgerFirmware, appTarget);
+                ledgerFirmware = elements[2].trimmed();
+                break;
             }
         }
     }
 
-    return ret;
+    if(ledgerFirmware.isEmpty())
+    {
+        return tr("Fail to get ledger firmware");
+    }
+
+    if(appTarget.isEmpty())
+    {
+        return tr("Fail to get app target");
+    }
+
+    QList<int> firmwareVersion;
+    QStringList elementsFirmware = ledgerFirmware.split(".");
+    for(QString element : elementsFirmware)
+    {
+        bool ok = true;
+        int version = element.toInt(&ok);
+        if(ok)
+        {
+            firmwareVersion.push_back(version);
+        }
+        else
+        {
+            return tr("Fail to parse firmware version: ") + ledgerFirmware;
+        }
+    }
+
+    QList<int> targetVersion;
+    QStringList elementsTarget = appTarget.split(".");
+    for(QString element : elementsTarget)
+    {
+        bool ok = true;
+        int version = element.toInt(&ok);
+        if(ok)
+        {
+            targetVersion.push_back(version);
+        }
+        else
+        {
+            return tr("Fail to parse target version: ") + appTarget;
+        }
+    }
+
+    if(firmwareVersion.size() < 2)
+    {
+        return tr("Firmware version not complete: ") + ledgerFirmware;
+    }
+
+    if(targetVersion.size() < 2)
+    {
+        return tr("Target version not complete: ") + appTarget;
+    }
+
+    // Check firmware version
+    bool needUpdate = false;
+    if(firmwareVersion[0] < targetVersion[0])
+    {
+        needUpdate = true;
+    }
+
+    if(firmwareVersion[0] == targetVersion[0] &&
+            firmwareVersion[1] < targetVersion[1])
+    {
+        needUpdate = true;
+    }
+
+    if(needUpdate)
+    {
+        return tr(UPDATE_FIRMWARE_FORMAT).arg(ledgerFirmware, appTarget);
+    }
+
+    return "";
 }
 
 bool QtumLedgerTool::checkDataDir()

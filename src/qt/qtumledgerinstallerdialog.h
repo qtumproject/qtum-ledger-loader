@@ -40,6 +40,8 @@ protected:
     QString uninstallInfo(InstallDevice::DeviceType type);
     QString appInfo(InstallDevice::DeviceType type);
     QString firmwareInfo();
+    bool installApp();
+    bool checkFirmware(QString& message);
 
 private:
     void createActions();
