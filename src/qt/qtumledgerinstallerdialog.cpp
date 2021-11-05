@@ -69,7 +69,7 @@ QtumLedgerInstallerDialog::~QtumLedgerInstallerDialog()
 void QtumLedgerInstallerDialog::on_addButton_clicked()
 {
     // Install Qtum app from ledger
-    WaitMessageBox dlg(tr("Ledger Status"), tr("Confirm Qtum install on your Ledger device..."), [this]() {
+    WaitMessageBox dlg(tr("Ledger Status"), installInfo(getDeviceType()), [this]() {
         d->ret = d->tool->installApp(getDeviceType());
     }, this);
 
@@ -90,7 +90,7 @@ void QtumLedgerInstallerDialog::on_addButton_clicked()
 void QtumLedgerInstallerDialog::on_removeButton_clicked()
 {
     // Remove Qtum app from ledger
-    WaitMessageBox dlg(tr("Ledger Status"), tr("Confirm Qtum removal on your Ledger device..."), [this]() {
+    WaitMessageBox dlg(tr("Ledger Status"), uninstallInfo(getDeviceType()), [this]() {
         d->ret = d->tool->removeApp(getDeviceType());
     }, this);
 
@@ -164,10 +164,10 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
     int deviceType = index;
     switch (deviceType) {
     case InstallDevice::WalletNanoS:
-        ui->labelInfo->setText(d->tool->infoApp(InstallDevice::WalletNanoS));
+        ui->labelInfo->setText(appInfo(InstallDevice::WalletNanoS));
         return ui->labelApp->setText("");
     case InstallDevice::StakeNanoS:
-        ui->labelInfo->setText(d->tool->infoApp(InstallDevice::StakeNanoS));
+        ui->labelInfo->setText(appInfo(InstallDevice::StakeNanoS));
         return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the auto lock:\n"
                                         "Nano S > Settings > Security > Auto-lock > OFF\n"
                                         "\n"
@@ -264,4 +264,44 @@ void QtumLedgerInstallerDialog::createMenuBar()
     help->addSeparator();
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+}
+
+QString QtumLedgerInstallerDialog::installInfo(InstallDevice::DeviceType type)
+{
+    LedgerAppInfo info = d->tool->appInfo(type);
+    QString message = tr("Confirm Qtum install on your Ledger device...\n\n");
+    message += "Public key:\n%1\n%2\n";
+    message += "Allow manager\n";
+    message += "Install app %3\n";
+    message += "Version %4\n";
+    message += "Identifier:\n%5\n";
+    message += "Perform Installation\n";
+    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName, info.appVersion, info.appIdentifier);
+}
+
+QString QtumLedgerInstallerDialog::uninstallInfo(InstallDevice::DeviceType type)
+{
+    LedgerAppInfo info = d->tool->appInfo(type);
+    QString message = tr("Confirm Qtum removal on your Ledger device...\n\n");
+    message += "Public key:\n%1\n%2\n";
+    message += "Allow manager\n";
+    message += "Uninstall %3\n";
+    message += "Identifier:\n%4\n";
+    message += "Confirm action\n";
+    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName, info.appIdentifier );
+}
+
+QString QtumLedgerInstallerDialog::appInfo(InstallDevice::DeviceType type)
+{
+    LedgerAppInfo info = d->tool->appInfo(type);
+    QString message = tr("App name:\t%1\nApp version:\t%2\nTarget version:\t%3\nHash app.hex:\t%4\n");
+    return message.arg(info.appName, info.appVersion, info.targetVersion, info.fileHash);
+}
+
+QString QtumLedgerInstallerDialog::firmwareInfo()
+{
+    QString message = tr("Allow reading firmware information from your Ledger device...\n\n");
+    message += "Random public key\n";
+    message += "Allow manager\n";
+    return message;
 }

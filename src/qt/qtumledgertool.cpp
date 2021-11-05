@@ -15,8 +15,8 @@
 
 static const QString LOAD_FORMAT = ":/ledger/%1_load";
 static const QString DELETE_FORMAT = ":/ledger/%1_delete";
+static const QString ID_FORMAT = ":/ledger/%1_app_id";
 static const QString RC_PATH_FORMAT = ":/ledger";
-static const char* INFO_APP_FORMAT = "App name:\t%1\nApp version:\t%2\nTarget version:\t%3\nSha256 hash:\t%4\nRoot private key:\t%5";
 static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\nPlease update the ledger firmware to the most recent version.";
 
 QString GetDataDir()
@@ -40,8 +40,7 @@ public:
     QProcess process;
     QString strStdout;
     QString strError;
-    QMap<InstallDevice::DeviceType, QString> info;
-    QMap<InstallDevice::DeviceType, QString> target;
+    QMap<InstallDevice::DeviceType, LedgerAppInfo> ledgerAppInfo;
 };
 
 QtumLedgerTool::QtumLedgerTool(QObject *parent) : QObject(parent)
@@ -288,9 +287,8 @@ bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type)
 
         // Get app target
         QString ledgerFirmware;
-        QString appTarget;
-        infoApp(type);
-        appTarget = d->target[type];
+        LedgerAppInfo info = appInfo(type);
+        QString appTarget = info.targetVersion;
 
         // Parse firmware version
         QString line;
@@ -438,20 +436,16 @@ bool QtumLedgerTool::installDependency()
     return ret;
 }
 
-QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
+LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
 {
     // Check the list
-    if(d->info.contains(type))
+    if(d->ledgerAppInfo.contains(type))
     {
-        return d->info[type];
+        return d->ledgerAppInfo[type];
     }
 
     // Parameters list
-    QString appName;
-    QString appVersion;
-    QString targetVersion;
-    QString fileHash;
-    QString rootPrivateKey;
+    LedgerAppInfo info;
 
     // Get Qtum App info from arguments
     InstallDevice device(type);
@@ -469,7 +463,7 @@ QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
                 i++;
                 if(i < arguments.size())
                 {
-                    appName = arguments[i];
+                    info.appName = arguments[i];
                 }
             }
             else if(argument == "--appVersion")
@@ -477,7 +471,7 @@ QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
                 i++;
                 if(i < arguments.size())
                 {
-                    appVersion = arguments[i];
+                    info.appVersion = arguments[i];
                 }
             }
             else if(argument == "--fileName")
@@ -493,7 +487,7 @@ QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
                 i++;
                 if(i < arguments.size())
                 {
-                    rootPrivateKey = arguments[i];
+                    info.rootPrivateKey = arguments[i];
                 }
             }
             else if(argument.startsWith("--targetVersion"))
@@ -501,7 +495,7 @@ QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
                 QStringList target = argument.split("=");
                 if(target.size() > 1)
                 {
-                    targetVersion = target[1];
+                    info.targetVersion = target[1];
                 }
             }
         }
@@ -514,13 +508,28 @@ QString QtumLedgerTool::infoApp(InstallDevice::DeviceType type)
         if(fileIn.open(QIODevice::ReadOnly))
         {
             QByteArray data = fileIn.readAll();
-            fileHash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex();
+            info.fileHash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex();
+        }
+    }
+
+    // Get the app identifer
+    QString identifierRC = ID_FORMAT.arg(InstallDevice::deviceToString(type));
+    if(QFile::exists(identifierRC))
+    {
+        QFile fileIn(identifierRC);
+        if(fileIn.open(QIODevice::ReadOnly))
+        {
+            info.appIdentifier = QString(fileIn.readAll()).trimmed();
         }
     }
 
     // Add the info into the list
-    QString info = tr(INFO_APP_FORMAT).arg(appName, appVersion, targetVersion, fileHash, rootPrivateKey);
-    d->info[type] = info;
-    d->target[type] = targetVersion;
+    d->ledgerAppInfo[type] = info;
     return info;
+}
+
+LedgerAppInfo::LedgerAppInfo()
+{
+    publicKeyP1 = "0473fc4f90e9f45df2baa558311481a886a91f7a32501878d6cd4933f672f5191";
+    publicKeyP2 = "c456ded3137b008dd691ed76ded40953c3f41c4ab7d0e6329c8e787e5059a2834";
 }

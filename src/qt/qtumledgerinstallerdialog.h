@@ -36,6 +36,10 @@ protected:
     QString getDeviceAppTitle(bool install);
     bool parseErrorMessage(QString& message, bool& dependency);
     void installDependency();
+    QString installInfo(InstallDevice::DeviceType type);
+    QString uninstallInfo(InstallDevice::DeviceType type);
+    QString appInfo(InstallDevice::DeviceType type);
+    QString firmwareInfo();
 
 private:
     void createActions();

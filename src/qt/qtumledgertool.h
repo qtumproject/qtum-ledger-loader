@@ -75,6 +75,19 @@ private:
     InstallDevicePriv *d;
 };
 
+struct LedgerAppInfo
+{
+    LedgerAppInfo();
+    QString publicKeyP1;
+    QString publicKeyP2;
+    QString appName;
+    QString appVersion;
+    QString appIdentifier;
+    QString targetVersion;
+    QString fileHash;
+    QString rootPrivateKey;
+};
+
 /**
  * @brief The QtumLedgerTool class Communicate with the Qtum Hardware Wallet Interface Tool
  */
@@ -127,11 +140,11 @@ public:
     bool installDependency();
 
     /**
-     * @brief infoApp
-     * @param type
+     * @brief appInfo Get app info
+     * @param type Application for install
      * @return Ledger application information
      */
-    QString infoApp(InstallDevice::DeviceType type);
+    LedgerAppInfo appInfo(InstallDevice::DeviceType type);
 
 Q_SIGNALS:
 
