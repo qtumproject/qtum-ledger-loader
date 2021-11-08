@@ -176,11 +176,11 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
         return ui->labelApp->setText("");
     case InstallDevice::StakeNanoS:
         ui->labelInfo->setText(appInfo(InstallDevice::StakeNanoS));
-        return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the auto lock:\n"
-                                        "Nano S > Settings > Security > Auto-lock > OFF\n"
+        return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the PIN lock:\n"
+                                        "Nano S > Settings > Security > PIN lock > Off\n"
                                         "\n"
-                                        "When Qtum Stake is removed, please turn on the auto lock:\n"
-                                        "Nano S > Settings > Security > Auto-lock > 10 minutes\n"));
+                                        "When Qtum Stake is removed, please turn on the PIN lock:\n"
+                                        "Nano S > Settings > Security > PIN lock > 10 minutes\n"));
     default:
         break;
     }
@@ -294,9 +294,8 @@ QString QtumLedgerInstallerDialog::uninstallInfo(InstallDevice::DeviceType type)
     message += "Public key:\n%1\n%2\n";
     message += "Allow manager\n";
     message += "Uninstall %3\n";
-    message += "Identifier:\n%4\n";
     message += "Confirm action\n";
-    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName, info.appIdentifier );
+    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName);
 }
 
 QString QtumLedgerInstallerDialog::appInfo(InstallDevice::DeviceType type)
