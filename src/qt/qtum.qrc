@@ -1,0 +1,60 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/icons">
+        <file alias="bitcoin">res/icons/bitcoin.png</file>
+    </qresource>
+    <qresource prefix="/ledger">
+        <file alias="nanos_app">res/ledger/nanos_app.hex</file>
+        <file alias="nanos_app_id">res/ledger/nanos_app.sha256</file>
+        <file alias="nanos_load">res/ledger/nanos_load.txt</file>
+        <file alias="nanos_delete">res/ledger/nanos_delete.txt</file>
+        <file alias="nanos_stake_app">res/ledger/nanos_stake_app.hex</file>
+        <file alias="nanos_stake_app_id">res/ledger/nanos_stake_app.sha256</file>
+        <file alias="nanos_stake_load">res/ledger/nanos_stake_load.txt</file>
+        <file alias="nanos_stake_delete">res/ledger/nanos_stake_delete.txt</file>
+        <file alias="nanos_test_app">res/ledger/nanos_test_app.hex</file>
+        <file alias="nanos_test_app_id">res/ledger/nanos_test_app.sha256</file>
+        <file alias="nanos_test_load">res/ledger/nanos_test_load.txt</file>
+        <file alias="nanos_test_delete">res/ledger/nanos_test_delete.txt</file>
+        <file alias="nanos_stake_test_app">res/ledger/nanos_stake_test_app.hex</file>
+        <file alias="nanos_stake_test_app_id">res/ledger/nanos_stake_test_app.sha256</file>
+        <file alias="nanos_stake_test_load">res/ledger/nanos_stake_test_load.txt</file>
+        <file alias="nanos_stake_test_delete">res/ledger/nanos_stake_test_delete.txt</file>
+    </qresource>
+    <qresource prefix="/styles/theme1">
+        <file alias="app">res/styles/theme1/app.css</file>
+        <file alias="config">res/styles/theme1/config.ini</file>
+    </qresource>
+    <qresource prefix="/styles/theme1/app-icons">
+        <file alias="up_arrow">res/styles/theme1/app-icons/up_arrow.png</file>
+        <file alias="down_arrow">res/styles/theme1/app-icons/down_arrow.png</file>
+        <file alias="up_arrow_hover">res/styles/theme1/app-icons/up_arrow_hover.png</file>
+        <file alias="down_arrow_hover">res/styles/theme1/app-icons/down_arrow_hover.png</file>
+        <file alias="up_arrow_disabled">res/styles/theme1/app-icons/up_arrow_disabled.png</file>
+        <file alias="down_arrow_disabled">res/styles/theme1/app-icons/down_arrow_disabled.png</file>
+        <file alias="checkbox_unchecked">res/styles/theme1/app-icons/checkbox_unchecked.png</file>
+        <file alias="checkbox_unchecked_hover">res/styles/theme1/app-icons/checkbox_unchecked_hover.png</file>
+        <file alias="checkbox_unchecked_disabled">res/styles/theme1/app-icons/checkbox_unchecked_disabled.png</file>
+        <file alias="checkbox_checked">res/styles/theme1/app-icons/checkbox_checked.png</file>
+        <file alias="checkbox_checked_hover">res/styles/theme1/app-icons/checkbox_checked_hover.png</file>
+        <file alias="checkbox_checked_disabled">res/styles/theme1/app-icons/checkbox_checked_disabled.png</file>
+        <file alias="checkbox_indeterminate">res/styles/theme1/app-icons/checkbox_indeterminate.png</file>
+        <file alias="checkbox_indeterminate_hover">res/styles/theme1/app-icons/checkbox_indeterminate_hover.png</file>
+        <file alias="checkbox_indeterminate_disabled">res/styles/theme1/app-icons/checkbox_indeterminate_disabled.png</file>
+        <file alias="radiobutton_unchecked">res/styles/theme1/app-icons/radiobutton_unchecked.png</file>
+        <file alias="radiobutton_unchecked_hover">res/styles/theme1/app-icons/radiobutton_unchecked_hover.png</file>
+        <file alias="radiobutton_unchecked_disabled">res/styles/theme1/app-icons/radiobutton_unchecked_disabled.png</file>
+        <file alias="radiobutton_checked">res/styles/theme1/app-icons/radiobutton_checked.png</file>
+        <file alias="radiobutton_checked_hover">res/styles/theme1/app-icons/radiobutton_checked_hover.png</file>
+        <file alias="radiobutton_checked_disabled">res/styles/theme1/app-icons/radiobutton_checked_disabled.png</file>
+        <file alias="slider_switcher">res/styles/theme1/app-icons/slider_switcher.png</file>
+        <file alias="slider_switcher_disabled">res/styles/theme1/app-icons/slider_switcher_disabled.png</file>
+        <file alias="slider_switcher_hover">res/styles/theme1/app-icons/slider_switcher_hover.png</file>
+        <file alias="cb_up_down_arrow">res/styles/theme1/app-icons/cb_up_down_arrow.png</file>
+        <file alias="right_arrow">res/styles/theme1/app-icons/right_arrow.png</file>
+        <file alias="down_arrow_unit">res/styles/theme1/app-icons/down_arrow_unit.png</file>
+        <file alias="message_critical">res/styles/theme1/app-icons/message_critical.png</file>
+        <file alias="message_info">res/styles/theme1/app-icons/message_info.png</file>
+        <file alias="message_warning">res/styles/theme1/app-icons/message_warning.png</file>
+        <file alias="message_question">res/styles/theme1/app-icons/message_question.png</file>
+    </qresource>
+</RCC>
