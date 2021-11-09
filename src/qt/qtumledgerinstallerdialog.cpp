@@ -163,6 +163,12 @@ bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message, bool& depend
         return true;
     }
 
+    if(errorMessage.contains("Invalid status 5103", Qt::CaseInsensitive))
+    {
+        message = tr("Not enough memory on your ledger.");
+        return true;
+    }
+
     message = d->tool->errorMessage();
     return true;
 }

@@ -497,7 +497,7 @@ LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
         if(fileIn.open(QIODevice::ReadOnly))
         {
             QByteArray data = fileIn.readAll();
-            info.fileHash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex();
+            info.fileHash = QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex().toUpper();
         }
     }
 
@@ -508,7 +508,7 @@ LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
         QFile fileIn(identifierRC);
         if(fileIn.open(QIODevice::ReadOnly))
         {
-            info.appIdentifier = QString(fileIn.readAll()).trimmed();
+            info.appIdentifier = QString(fileIn.readAll()).trimmed().toUpper();
         }
     }
 
@@ -519,6 +519,6 @@ LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
 
 LedgerAppInfo::LedgerAppInfo()
 {
-    publicKeyP1 = "0473fc4f90e9f45df2baa558311481a886a91f7a32501878d6cd4933f672f5191";
-    publicKeyP2 = "c456ded3137b008dd691ed76ded40953c3f41c4ab7d0e6329c8e787e5059a2834";
+    publicKeyP1 = QString("0473fc4f90e9f45df2baa558311481a886a91f7a32501878d6cd4933f672f5191").toUpper();
+    publicKeyP2 = QString("c456ded3137b008dd691ed76ded40953c3f41c4ab7d0e6329c8e787e5059a2834").toUpper();
 }
