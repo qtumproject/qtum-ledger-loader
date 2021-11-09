@@ -58,12 +58,34 @@ public:
      */
     bool deleteCommand(QString &program, QStringList &arguments);
 
+    /**
+     * @brief firmwareCommand Get the firmware command
+     * @param program Program to start
+     * @param arguments Program arguments
+     * @return Success of the operation
+     */
+    bool firmwareCommand(QString &program, QStringList &arguments);
+
 private:
     bool getRCCommand(const QString &rcPath, QString &program, QStringList &arguments);
+    bool getCommand(const QString &command, QString &program, QStringList &arguments);
     QString parse(QString arg);
 
 private:
     InstallDevicePriv *d;
+};
+
+struct LedgerAppInfo
+{
+    LedgerAppInfo();
+    QString publicKeyP1;
+    QString publicKeyP2;
+    QString appName;
+    QString appVersion;
+    QString appIdentifier;
+    QString targetVersion;
+    QString fileHash;
+    QString rootPrivateKey;
 };
 
 /**
@@ -99,6 +121,14 @@ public:
     bool removeApp(InstallDevice::DeviceType type);
 
     /**
+     * @brief checkFirmware Check the firmware
+     * @param type Application for install
+     * @param message Firmware check message
+     * @return whether or not the application can be installed on this firmware
+     */
+    bool checkFirmware(InstallDevice::DeviceType type, QString& message);
+
+    /**
      * @brief errorMessage Get the last error message
      * @return Last error message
      */
@@ -110,6 +140,13 @@ public:
      */
     bool installDependency();
 
+    /**
+     * @brief appInfo Get app info
+     * @param type Application for install
+     * @return Ledger application information
+     */
+    LedgerAppInfo appInfo(InstallDevice::DeviceType type);
+
 Q_SIGNALS:
 
 public Q_SLOTS:
@@ -118,6 +155,7 @@ private:
     bool isStarted();
     void wait();
     bool checkDataDir();
+    QString firmwareMessage(InstallDevice::DeviceType type);
 
     QtumLedgerToolPriv* d;
 };

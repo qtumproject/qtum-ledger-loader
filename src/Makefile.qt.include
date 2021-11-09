@@ -6,13 +6,16 @@ bin_PROGRAMS += qt/qtum_loader-qt
 
 EXTRA_LIBRARIES += qt/libbitcoinqt.a
 
-QT_FORMS_UI = 
+QT_FORMS_UI = \
+  qt/forms/qtumledgerinstallerdialog.ui \
+  qt/forms/helpmessagedialog.ui
 
 QT_MOC_CPP = \
   qt/moc_qtumledgerinstallerdialog.cpp \
   qt/moc_qtumledgertool.cpp \
   qt/moc_qtumversionchecker.cpp \
-  qt/moc_waitmessagebox.cpp
+  qt/moc_waitmessagebox.cpp \
+  qt/moc_utilitydialog.cpp
 
 BITCOIN_MM = 
 
@@ -29,7 +32,9 @@ BITCOIN_QT_H = \
   qt/waitmessagebox.h \
   qt/guiconstants.h \
   qt/networkstyle.h \
-  qt/styleSheet.h
+  qt/styleSheet.h \
+  qt/utilitydialog.h \
+  qt/guiutil.h
 
 RES_ICONS = \
   qt/res/icons/bitcoin.ico \
@@ -43,7 +48,9 @@ BITCOIN_QT_BASE_CPP = \
   qt/qtumversionchecker.cpp \
   qt/waitmessagebox.cpp \
   qt/networkstyle.cpp \
-  qt/styleSheet.cpp
+  qt/styleSheet.cpp \
+  qt/utilitydialog.cpp \
+  qt/guiutil.cpp
 
 BITCOIN_QT_WINDOWS_CPP = 
 
@@ -88,15 +95,19 @@ qt/res/styles/theme1/app-icons/message_info.png \
 qt/res/styles/theme1/app-icons/message_question.png
 
 RES_LEDGER = qt/res/ledger/nanos_app.hex \
+qt/res/ledger/nanos_app.sha256 \
 qt/res/ledger/nanos_load.txt \
 qt/res/ledger/nanos_delete.txt \
 qt/res/ledger/nanos_stake_app.hex \
+qt/res/ledger/nanos_stake_app.sha256 \
 qt/res/ledger/nanos_stake_load.txt \
 qt/res/ledger/nanos_stake_delete.txt \
 qt/res/ledger/nanos_test_app.hex \
+qt/res/ledger/nanos_test_app.sha256 \
 qt/res/ledger/nanos_test_load.txt \
 qt/res/ledger/nanos_test_delete.txt \
 qt/res/ledger/nanos_stake_test_app.hex \
+qt/res/ledger/nanos_stake_test_app.sha256 \
 qt/res/ledger/nanos_stake_test_load.txt \
 qt/res/ledger/nanos_stake_test_delete.txt
 
@@ -130,7 +141,7 @@ qtum_loader_qt_cppflags = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUD
   $(QT_INCLUDES) $(QR_CFLAGS)
 qtum_loader_qt_cxxflags = $(AM_CXXFLAGS) $(QT_PIE_FLAGS)
 
-qtum_loader_qt_sources = qt/main.cpp
+qtum_loader_qt_sources = qt/main.cpp $(nodist_qt_libbitcoinqt_a_SOURCES)
 if TARGET_WINDOWS
   qtum_loader_qt_sources += $(BITCOIN_RC)
 endif

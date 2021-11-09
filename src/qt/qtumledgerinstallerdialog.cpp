@@ -1,158 +1,60 @@
+#if defined(HAVE_CONFIG_H)
+#include <config/bitcoin-config.h>
+#endif
+
 #include <qt/qtumledgerinstallerdialog.h>
+#include <qt/forms/ui_qtumledgerinstallerdialog.h>
 #include <qt/waitmessagebox.h>
 #include <qt/qtumversionchecker.h>
+#include <qt/utilitydialog.h>
+#include <clientversion.h>
 
 #include <QVariant>
 #include <QMessageBox>
-#include <QAction>
-#include <QButtonGroup>
-#include <QComboBox>
-#include <QDialog>
-#include <QHBoxLayout>
-#include <QHeaderView>
-#include <QLabel>
-#include <QPushButton>
-#include <QSpacerItem>
-#include <QVBoxLayout>
-#include <QWidget>
-#include <QCheckBox>
 #include <QSettings>
 #include <QTimer>
+#include <QMenu>
+#include <QAction>
+#include <QMenuBar>
 
 static const bool DEFAULT_CHECK_FOR_UPDATES = true;
 
 class QtumLedgerInstallerDialogPriv
 {
 public:
-    QtumLedgerInstallerDialogPriv(QDialog *parentWidget)
+    QtumLedgerInstallerDialogPriv(QObject *parent)
     {
-        tool = new QtumLedgerTool(parentWidget);
-        setupUi(parentWidget);
+        tool = new QtumLedgerTool(parent);
     }
 
     QtumLedgerTool* tool = 0;
     bool ret = false;
-
-    QVBoxLayout *verticalLayout_2;
-    QVBoxLayout *verticalLayout;
-    QLabel *labelTitle;
-    QHBoxLayout *horizontalLayout;
-    QLabel *labelLedgerType;
-    QComboBox *cbLedgerApp;
-    QSpacerItem *verticalSpacer;
-    QLabel *labelApp;
-    QWidget *buttonsContainerWhite;
-    QHBoxLayout *horizontalLayout_2;
-    QPushButton *addButton;
-    QPushButton *removeButton;
-    QSpacerItem *horizontalSpacer;
-    QCheckBox *updateCheckBox;
-
-private:
-    void setupUi(QDialog *parentWidget)
-    {
-        if (parentWidget->objectName().isEmpty())
-            parentWidget->setObjectName(QStringLiteral("QtumLedgerInstallerDialog"));
-        parentWidget->resize(662, 338);
-        verticalLayout_2 = new QVBoxLayout(parentWidget);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, -1, 0, 0);
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setSpacing(12);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(30, -1, 30, -1);
-        labelTitle = new QLabel(parentWidget);
-        labelTitle->setObjectName(QStringLiteral("labelTitle"));
-        QFont font;
-        font.setBold(true);
-        font.setWeight(75);
-        labelTitle->setFont(font);
-
-        verticalLayout->addWidget(labelTitle);
-
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        horizontalLayout->setContentsMargins(10, -1, -1, -1);
-        labelLedgerType = new QLabel(parentWidget);
-        labelLedgerType->setObjectName(QStringLiteral("labelLedgerType"));
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(labelLedgerType->sizePolicy().hasHeightForWidth());
-        labelLedgerType->setSizePolicy(sizePolicy);
-
-        horizontalLayout->addWidget(labelLedgerType);
-
-        cbLedgerApp = new QComboBox(parentWidget);
-        cbLedgerApp->setObjectName(QStringLiteral("cbLedgerApp"));
-
-        horizontalLayout->addWidget(cbLedgerApp);
-
-        verticalLayout->addLayout(horizontalLayout);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
-
-        labelApp = new QLabel(parentWidget);
-        labelApp->setObjectName(QStringLiteral("labelApp"));
-        labelApp->setWordWrap(true);
-
-        verticalLayout->addWidget(labelApp);
-
-        verticalLayout_2->addLayout(verticalLayout);
-
-        buttonsContainerWhite = new QWidget(parentWidget);
-        buttonsContainerWhite->setObjectName(QStringLiteral("buttonsContainerWhite"));
-        horizontalLayout_2 = new QHBoxLayout(buttonsContainerWhite);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        horizontalLayout_2->setContentsMargins(30, 15, 30, -1);
-        addButton = new QPushButton(buttonsContainerWhite);
-        addButton->setObjectName(QStringLiteral("addButton"));
-
-        horizontalLayout_2->addWidget(addButton);
-
-        removeButton = new QPushButton(buttonsContainerWhite);
-        removeButton->setObjectName(QStringLiteral("removeButton"));
-
-        horizontalLayout_2->addWidget(removeButton);
-
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_2->addItem(horizontalSpacer);
-
-        updateCheckBox = new QCheckBox(buttonsContainerWhite);
-        updateCheckBox->setChecked(DEFAULT_CHECK_FOR_UPDATES);
-        updateCheckBox->setObjectName(QStringLiteral("updateCheckBox"));
-
-        horizontalLayout_2->addWidget(updateCheckBox);
-        verticalLayout_2->addWidget(buttonsContainerWhite);
-
-        QMetaObject::connectSlotsByName(parentWidget);
-    }
+    QString message;
 };
 
 QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
-    QDialog(parent)
+    QMainWindow(parent),
+    ui(new Ui::QtumLedgerInstallerDialog)
 {
-    setWindowTitle(tr("Qtum ledger application loader"));
-
+    ui->setupUi(this);
     d = new QtumLedgerInstallerDialogPriv(this);
-    d->labelTitle->setText(tr("Install or remove QTUM app from ledger."));
-    d->labelLedgerType->setText(tr("Select ledger application:"));
-    d->labelApp->setText(QString());
-    d->addButton->setText(tr("Install"));
-    d->removeButton->setText(tr("Remove"));
-    d->updateCheckBox->setText(tr("Check for updates"));
-    d->cbLedgerApp->addItem(tr("Qtum Wallet Nano S"), InstallDevice::WalletNanoS);
-    d->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
-    d->labelApp->setStyleSheet("QLabel { color: red; }");
+
+    QString title = windowTitle() + " " + QString::fromStdString(FormatFullVersion());
+    setWindowTitle(title);
+
+    ui->cbLedgerApp->addItem(tr("Qtum Wallet Nano S"), InstallDevice::WalletNanoS);
+    ui->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
+
+    ui->labelApp->setStyleSheet("QLabel { color: red; }");
+
+    createActions();
+    createMenuBar();
 
     QSettings settings;
     if (!settings.contains("fCheckForUpdates"))
         settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
     bool fCheckForUpdates = settings.value("fCheckForUpdates").toBool();
-    d->updateCheckBox->setChecked(fCheckForUpdates);
+    ui->updateCheckBox->setChecked(fCheckForUpdates);
     if(fCheckForUpdates)
     {
         QTimer::singleShot(1000, this, SLOT(checkForUpdates()));
@@ -161,19 +63,26 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
 
 QtumLedgerInstallerDialog::~QtumLedgerInstallerDialog()
 {
+    delete ui;
     delete d;
 }
 
 void QtumLedgerInstallerDialog::on_addButton_clicked()
 {
-    // Install Qtum app from ledger
-    WaitMessageBox dlg(tr("Ledger Status"), tr("Confirm Qtum install on your Ledger device..."), [this]() {
-        d->ret = d->tool->installApp(getDeviceType());
-    }, this);
-
-    dlg.exec();
-
     QString message;
+    if(checkFirmware(message))
+    {
+        if(message.isEmpty())
+        {
+            installApp();
+        }
+        else
+        {
+            QString title = getDeviceAppTitle(true);
+            QMessageBox::warning(this, title, message);
+        }
+    }
+
     bool dependency = false;
     if(!d->ret && parseErrorMessage(message, dependency))
     {
@@ -188,7 +97,7 @@ void QtumLedgerInstallerDialog::on_addButton_clicked()
 void QtumLedgerInstallerDialog::on_removeButton_clicked()
 {
     // Remove Qtum app from ledger
-    WaitMessageBox dlg(tr("Ledger Status"), tr("Confirm Qtum removal on your Ledger device..."), [this]() {
+    WaitMessageBox dlg(tr("Ledger Status"), uninstallInfo(getDeviceType()), [this]() {
         d->ret = d->tool->removeApp(getDeviceType());
     }, this);
 
@@ -214,7 +123,7 @@ void QtumLedgerInstallerDialog::on_updateCheckBox_clicked(bool checked)
 
 InstallDevice::DeviceType QtumLedgerInstallerDialog::getDeviceType()
 {
-    int deviceType = d->cbLedgerApp->currentData().toInt();
+    int deviceType = ui->cbLedgerApp->currentData().toInt();
     switch (deviceType) {
     case InstallDevice::WalletNanoS:
         return InstallDevice::WalletNanoS;
@@ -231,7 +140,8 @@ bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message, bool& depend
 {
     dependency = false;
     QString errorMessage = d->tool->errorMessage();
-    if(errorMessage.contains("denied by the user", Qt::CaseInsensitive))
+    if(errorMessage.contains("denied by the user", Qt::CaseInsensitive) ||
+            errorMessage.contains("Invalid status 5501", Qt::CaseInsensitive))
         return false;
 
     if(errorMessage.contains("ModuleNotFoundError", Qt::CaseInsensitive) && errorMessage.contains("ledgerblue", Qt::CaseInsensitive))
@@ -253,6 +163,12 @@ bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message, bool& depend
         return true;
     }
 
+    if(errorMessage.contains("Invalid status 5103", Qt::CaseInsensitive))
+    {
+        message = tr("Not enough memory on your ledger.");
+        return true;
+    }
+
     message = d->tool->errorMessage();
     return true;
 }
@@ -262,13 +178,15 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
     int deviceType = index;
     switch (deviceType) {
     case InstallDevice::WalletNanoS:
-        return d->labelApp->setText("");
+        ui->labelInfo->setText(appInfo(InstallDevice::WalletNanoS));
+        return ui->labelApp->setText("");
     case InstallDevice::StakeNanoS:
-        return d->labelApp->setText(tr("When Qtum Stake is installed, please turn off the auto lock:\n"
-                                        "Nano S > Settings > Security > Auto-lock > OFF\n"
+        ui->labelInfo->setText(appInfo(InstallDevice::StakeNanoS));
+        return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the PIN lock:\n"
+                                        "Nano S > Settings > Security > PIN lock > Off\n"
                                         "\n"
-                                        "When Qtum Stake is removed, please turn on the auto lock:\n"
-                                        "Nano S > Settings > Security > Auto-lock > 10 minutes\n"));
+                                        "When Qtum Stake is removed, please turn on the PIN lock:\n"
+                                        "Nano S > Settings > Security > PIN lock > 10 minutes\n"));
     default:
         break;
     }
@@ -313,4 +231,114 @@ QString QtumLedgerInstallerDialog::getDeviceAppTitle(bool install)
     if(install)
         return getDeviceType() == InstallDevice::WalletNanoS ? tr("Qtum Wallet install problem") : tr("Qtum Stake install problem");
     return getDeviceType() == InstallDevice::WalletNanoS ? tr("Qtum Wallet remove problem") : tr("Qtum Stake remove problem");
+}
+
+void QtumLedgerInstallerDialog::createActions()
+{
+    showHelpMessageAction = new QAction(tr("&Command-line options"), this);
+    showHelpMessageAction->setMenuRole(QAction::NoRole);
+    showHelpMessageAction->setStatusTip(tr("Show the %1 help message to get a list with possible Qtum command-line options").arg(PACKAGE_NAME));
+    connect(showHelpMessageAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::showHelpMessageClicked);
+
+    aboutAction = new QAction(tr("&About %1").arg(PACKAGE_NAME), this);
+    aboutAction->setStatusTip(tr("Show information about %1").arg(PACKAGE_NAME));
+    aboutAction->setMenuRole(QAction::AboutRole);
+    connect(aboutAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::aboutClicked);
+
+    aboutQtAction = new QAction(tr("About &Qt"), this);
+    aboutQtAction->setStatusTip(tr("Show information about Qt"));
+    aboutQtAction->setMenuRole(QAction::AboutQtRole);
+    connect(aboutQtAction, &QAction::triggered, qApp, QApplication::aboutQt);
+}
+
+void QtumLedgerInstallerDialog::showHelpMessageClicked()
+{
+    HelpMessageDialog dlg(this, false);
+    dlg.exec();
+}
+
+void QtumLedgerInstallerDialog::aboutClicked()
+{
+    HelpMessageDialog dlg(this, true);
+    dlg.exec();
+}
+
+void QtumLedgerInstallerDialog::createMenuBar()
+{
+#ifdef Q_OS_MAC
+    // Create a decoupled menu bar on Mac which stays even if the window is closed
+    appMenuBar = new QMenuBar();
+#else
+    // Get the main window's menu bar on other platforms
+    appMenuBar = menuBar();
+#endif
+
+    QMenu *help = appMenuBar->addMenu(tr("&Help"));
+    help->addAction(showHelpMessageAction);
+    help->addSeparator();
+    help->addAction(aboutAction);
+    help->addAction(aboutQtAction);
+}
+
+QString QtumLedgerInstallerDialog::installInfo(InstallDevice::DeviceType type)
+{
+    LedgerAppInfo info = d->tool->appInfo(type);
+    QString message = tr("Confirm Qtum install on your Ledger device...\n\n");
+    message += "Public key:\n%1\n%2\n";
+    message += "Allow manager\n";
+    message += "Install app %3\n";
+    message += "Version %4\n";
+    message += "Identifier:\n%5\n";
+    message += "Perform Installation\n";
+    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName, info.appVersion, info.appIdentifier);
+}
+
+QString QtumLedgerInstallerDialog::uninstallInfo(InstallDevice::DeviceType type)
+{
+    LedgerAppInfo info = d->tool->appInfo(type);
+    QString message = tr("Confirm Qtum removal on your Ledger device...\n\n");
+    message += "Public key:\n%1\n%2\n";
+    message += "Allow manager\n";
+    message += "Uninstall %3\n";
+    message += "Confirm action\n";
+    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName);
+}
+
+QString QtumLedgerInstallerDialog::appInfo(InstallDevice::DeviceType type)
+{
+    LedgerAppInfo info = d->tool->appInfo(type);
+    QString message = tr("App name:\t%1\nApp version:\t%2\nTarget version:\t%3\nHash app.hex:\t%4\n");
+    return message.arg(info.appName, info.appVersion, info.targetVersion, info.fileHash);
+}
+
+QString QtumLedgerInstallerDialog::firmwareInfo()
+{
+    QString message = tr("Allow reading firmware information from your Ledger device...\n\n");
+    message += "Public key (random)\n";
+    message += "Allow manager\n";
+    return message;
+}
+
+bool QtumLedgerInstallerDialog::installApp()
+{
+    // Install Qtum app from ledger
+    WaitMessageBox dlg(tr("Ledger Status"), installInfo(getDeviceType()), [this]() {
+        d->ret = d->tool->installApp(getDeviceType());
+    }, this);
+
+    dlg.exec();
+    return d->ret;
+}
+
+bool QtumLedgerInstallerDialog::checkFirmware(QString &message)
+{
+    // Check ledger firmware
+    d->message.clear();
+    WaitMessageBox dlg(tr("Ledger Status"), firmwareInfo(), [this]() {
+        d->ret = d->tool->checkFirmware(getDeviceType(), d->message);
+    }, this);
+
+    dlg.exec();
+    message = d->message;
+    return d->ret;
 }

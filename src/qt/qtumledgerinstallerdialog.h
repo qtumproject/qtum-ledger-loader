@@ -1,18 +1,28 @@
 #ifndef QTUMLEDGERINSTALLERDIALOG_H
 #define QTUMLEDGERINSTALLERDIALOG_H
 
-#include <QDialog>
+#include <QMainWindow>
 #include <qt/qtumledgertool.h>
 
 class QtumLedgerInstallerDialogPriv;
+class QAction;
+class QMenuBar;
 
-class QtumLedgerInstallerDialog : public QDialog
+namespace Ui {
+class QtumLedgerInstallerDialog;
+}
+
+class QtumLedgerInstallerDialog : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit QtumLedgerInstallerDialog(QWidget *parent = nullptr);
     ~QtumLedgerInstallerDialog();
+
+public Q_SLOTS:
+    void showHelpMessageClicked();
+    void aboutClicked();
 
 private Q_SLOTS:
     void on_addButton_clicked();
@@ -26,8 +36,25 @@ protected:
     QString getDeviceAppTitle(bool install);
     bool parseErrorMessage(QString& message, bool& dependency);
     void installDependency();
+    QString installInfo(InstallDevice::DeviceType type);
+    QString uninstallInfo(InstallDevice::DeviceType type);
+    QString appInfo(InstallDevice::DeviceType type);
+    QString firmwareInfo();
+    bool installApp();
+    bool checkFirmware(QString& message);
 
 private:
+    void createActions();
+    void createMenuBar();
+
+private:
+    QMenuBar* appMenuBar = nullptr;
+
+    QAction* showHelpMessageAction = nullptr;
+    QAction* aboutAction = nullptr;
+    QAction* aboutQtAction = nullptr;
+
+    Ui::QtumLedgerInstallerDialog *ui;
     QtumLedgerInstallerDialogPriv *d;
 };
 

@@ -34,7 +34,11 @@ BITCOIN_CORE_H = \
   compat/byteswap.h \
   compat/cpuid.h \
   compat/endian.h \
-  compat/sanity.h
+  compat/sanity.h \
+  init.h \
+  util/strencodings.h \
+  util/system.h \
+  tinyformat.h
 
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
@@ -52,6 +56,9 @@ libbitcoin_util_a_SOURCES = \
   compat/glibc_sanity.cpp \
   compat/glibcxx_sanity.cpp \
   compat/strnlen.cpp \
+  init.cpp \
+  util/strencodings.cpp \
+  util/system.cpp \
   $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
