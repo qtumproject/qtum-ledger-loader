@@ -19,6 +19,13 @@ static const QString ID_FORMAT = ":/ledger/%1_app_id";
 static const QString RC_PATH_FORMAT = ":/ledger";
 static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\n\nPlease update the ledger firmware to the most recent version.";
 
+bool fMainnet = true;
+
+bool isMainnet()
+{
+    return fMainnet;
+}
+
 QString GetDataDir()
 {
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -40,7 +47,14 @@ public:
     QProcess process;
     QString strStdout;
     QString strError;
-    QMap<InstallDevice::DeviceType, LedgerAppInfo> ledgerAppInfo;
+    QMap<InstallDevice::DeviceType, LedgerAppInfo>& ledgerAppInfo()
+    {
+        return isMainnet() ? mainnetLedgerAppInfo : testnetLedgerAppInfo;
+    }
+
+private:
+    QMap<InstallDevice::DeviceType, LedgerAppInfo> mainnetLedgerAppInfo;
+    QMap<InstallDevice::DeviceType, LedgerAppInfo> testnetLedgerAppInfo;
 };
 
 QtumLedgerTool::QtumLedgerTool(QObject *parent) : QObject(parent)
@@ -111,14 +125,6 @@ InstallDevice::InstallDevice(InstallDevice::DeviceType type)
 InstallDevice::~InstallDevice()
 {
     delete d;
-}
-
-bool isMainnet()
-{
-    QStringList arguments = qApp->arguments();
-    if(arguments.contains("-regtest") || arguments.contains("-testnet") || arguments.contains("-signet"))
-        return false;
-    return true;
 }
 
 QString InstallDevice::deviceToString(InstallDevice::DeviceType type)
@@ -428,9 +434,9 @@ bool QtumLedgerTool::installDependency()
 LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
 {
     // Check the list
-    if(d->ledgerAppInfo.contains(type))
+    if(d->ledgerAppInfo().contains(type))
     {
-        return d->ledgerAppInfo[type];
+        return d->ledgerAppInfo()[type];
     }
 
     // Parameters list
@@ -513,7 +519,7 @@ LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
     }
 
     // Add the info into the list
-    d->ledgerAppInfo[type] = info;
+    d->ledgerAppInfo()[type] = info;
     return info;
 }
 

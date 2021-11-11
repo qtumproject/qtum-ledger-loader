@@ -10,6 +10,8 @@ class InstallDevicePriv;
 static const QString DEPENDENCY_INSTALL_CMD = "pip3 install --user ledgerblue";
 static const QString DEPENDENCY_SHOW_CMD = "pip3 show ledgerblue";
 
+extern bool fMainnet;
+
 /**
  * @brief The InstallDevice class Install Qtum app to device
  */
