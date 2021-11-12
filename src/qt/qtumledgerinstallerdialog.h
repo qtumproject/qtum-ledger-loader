@@ -21,8 +21,9 @@ public:
     ~QtumLedgerInstallerDialog();
 
 public Q_SLOTS:
-    void showHelpMessageClicked();
     void aboutClicked();
+    void mainnetClicked();
+    void testnetClicked();
 
 private Q_SLOTS:
     void on_addButton_clicked();
@@ -42,6 +43,7 @@ protected:
     QString firmwareInfo();
     bool installApp();
     bool checkFirmware(QString& message);
+    void refreshNetAppInfo();
 
 private:
     void createActions();
@@ -50,7 +52,8 @@ private:
 private:
     QMenuBar* appMenuBar = nullptr;
 
-    QAction* showHelpMessageAction = nullptr;
+    QAction* mainnetAction = nullptr;
+    QAction* testnetAction = nullptr;
     QAction* aboutAction = nullptr;
     QAction* aboutQtAction = nullptr;
 
