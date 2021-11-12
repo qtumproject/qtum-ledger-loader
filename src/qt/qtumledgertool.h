@@ -68,6 +68,14 @@ public:
      */
     bool firmwareCommand(QString &program, QStringList &arguments);
 
+    /**
+     * @brief genPairCommand Gen key pair command
+     * @param program Program to start
+     * @param arguments Program arguments
+     * @return Success of the operation
+     */
+    bool genKeyPairCommand(QString &program, QStringList &arguments);
+
 private:
     bool getRCCommand(const QString &rcPath, QString &program, QStringList &arguments);
     bool getCommand(const QString &command, QString &program, QStringList &arguments);
@@ -79,15 +87,11 @@ private:
 
 struct LedgerAppInfo
 {
-    LedgerAppInfo();
-    QString publicKeyP1;
-    QString publicKeyP2;
     QString appName;
     QString appVersion;
     QString appIdentifier;
     QString targetVersion;
     QString fileHash;
-    QString rootPrivateKey;
 };
 
 /**
@@ -131,6 +135,12 @@ public:
     bool checkFirmware(InstallDevice::DeviceType type, QString& message);
 
     /**
+     * @brief getKeyPair Get key pair for root
+     * @return success of the operation
+     */
+    bool getKeyPair();
+
+    /**
      * @brief errorMessage Get the last error message
      * @return Last error message
      */
@@ -148,6 +158,13 @@ public:
      * @return Ledger application information
      */
     LedgerAppInfo appInfo(InstallDevice::DeviceType type);
+
+    /**
+     * @brief getPubKey Get public key
+     * @param publicKeyP1 Part 1
+     * @param publicKeyP2 Part 2
+     */
+    void getPubKey(QString& publicKeyP1, QString& publicKeyP2);
 
 Q_SIGNALS:
 

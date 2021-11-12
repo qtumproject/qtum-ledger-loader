@@ -99,6 +99,7 @@ void QtumLedgerInstallerDialog::on_addButton_clicked()
 void QtumLedgerInstallerDialog::on_removeButton_clicked()
 {
     // Remove Qtum app from ledger
+    d->tool->getKeyPair();
     WaitMessageBox dlg(tr("Ledger Status"), uninstallInfo(getDeviceType()), [this]() {
         d->ret = d->tool->removeApp(getDeviceType());
     }, this);
@@ -289,6 +290,8 @@ void QtumLedgerInstallerDialog::createMenuBar()
 
 QString QtumLedgerInstallerDialog::installInfo(InstallDevice::DeviceType type)
 {
+    QString publicKeyP1, publicKeyP2;
+    d->tool->getPubKey(publicKeyP1, publicKeyP2);
     LedgerAppInfo info = d->tool->appInfo(type);
     QString message = tr("Confirm Qtum install on your Ledger device...\n\n");
     message += "Public key:\n%1\n%2\n";
@@ -297,18 +300,20 @@ QString QtumLedgerInstallerDialog::installInfo(InstallDevice::DeviceType type)
     message += "Version %4\n";
     message += "Identifier:\n%5\n";
     message += "Perform Installation\n";
-    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName, info.appVersion, info.appIdentifier);
+    return message.arg(publicKeyP1, publicKeyP2, info.appName, info.appVersion, info.appIdentifier);
 }
 
 QString QtumLedgerInstallerDialog::uninstallInfo(InstallDevice::DeviceType type)
 {
+    QString publicKeyP1, publicKeyP2;
+    d->tool->getPubKey(publicKeyP1, publicKeyP2);
     LedgerAppInfo info = d->tool->appInfo(type);
     QString message = tr("Confirm Qtum removal on your Ledger device...\n\n");
     message += "Public key:\n%1\n%2\n";
     message += "Allow manager\n";
     message += "Uninstall %3\n";
     message += "Confirm action\n";
-    return message.arg(info.publicKeyP1, info.publicKeyP2, info.appName);
+    return message.arg(publicKeyP1, publicKeyP2, info.appName);
 }
 
 QString QtumLedgerInstallerDialog::appInfo(InstallDevice::DeviceType type)
@@ -329,6 +334,7 @@ QString QtumLedgerInstallerDialog::firmwareInfo()
 bool QtumLedgerInstallerDialog::installApp()
 {
     // Install Qtum app from ledger
+    d->tool->getKeyPair();
     WaitMessageBox dlg(tr("Ledger Status"), installInfo(getDeviceType()), [this]() {
         d->ret = d->tool->installApp(getDeviceType());
     }, this);

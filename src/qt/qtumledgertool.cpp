@@ -51,6 +51,9 @@ public:
     {
         return isMainnet() ? mainnetLedgerAppInfo : testnetLedgerAppInfo;
     }
+    QString publicKeyP1;
+    QString publicKeyP2;
+    QString rootPrivateKey;
 
 private:
     QMap<InstallDevice::DeviceType, LedgerAppInfo> mainnetLedgerAppInfo;
@@ -160,6 +163,13 @@ bool InstallDevice::firmwareCommand(QString &program, QStringList &arguments)
     QString command = "python3 -m ledgerblue.checkGenuine --targetId 0x31100004";
     return getCommand(command, program, arguments);
 }
+
+bool InstallDevice::genKeyPairCommand(QString &program, QStringList &arguments)
+{
+    QString command = "python3 -m ledgerblue.genCAPair";
+    return getCommand(command, program, arguments);
+}
+
 bool InstallDevice::getRCCommand(const QString &rcPath, QString &program, QStringList &arguments)
 {
     // Get the command
@@ -231,6 +241,11 @@ bool QtumLedgerTool::installApp(InstallDevice::DeviceType type)
     QString program;
     QStringList arguments;
     bool ret = device.loadCommand(program, arguments);
+    if(!d->rootPrivateKey.isEmpty())
+    {
+        arguments.push_back("--rootPrivateKey");
+        arguments.push_back(d->rootPrivateKey);
+    }
     if(ret)
     {
         d->process.start(program, arguments);
@@ -256,6 +271,11 @@ bool QtumLedgerTool::removeApp(InstallDevice::DeviceType type)
     QString program;
     QStringList arguments;
     bool ret = device.deleteCommand(program, arguments);
+    if(!d->rootPrivateKey.isEmpty())
+    {
+        arguments.push_back("--rootPrivateKey");
+        arguments.push_back(d->rootPrivateKey);
+    }
     if(ret)
     {
         d->process.start(program, arguments);
@@ -276,7 +296,7 @@ bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type, QString& mess
     if(!checkDataDir())
         return false;
 
-    // Install Qtum App to ledger
+    // Get firmware for ledger
     InstallDevice device(type);
     QString program;
     QStringList arguments;
@@ -292,6 +312,55 @@ bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type, QString& mess
         ret &= d->strError.isEmpty();
 
         message = firmwareMessage(type);
+    }
+
+    return ret;
+}
+
+bool QtumLedgerTool::getKeyPair()
+{
+    // Check data dir
+    if(!checkDataDir())
+        return false;
+
+    // Get key pair
+    InstallDevice device;
+    QString program;
+    QStringList arguments;
+    bool ret = device.genKeyPairCommand(program, arguments);
+    if(ret)
+    {
+        d->process.start(program, arguments);
+        d->fStarted = true;
+
+        wait();
+
+        ret &= QProcess::NormalExit == d->process.exitStatus();
+        ret &= d->strStdout.contains("Public key");
+        ret &= d->strStdout.contains("Private key");
+
+        if(ret)
+        {
+            QString lines = d->strStdout;
+            QStringList elements = lines.replace("\n", " ").split(" ");
+            for(QString element : elements)
+            {
+                element = element.trimmed().toUpper();
+                if(element.size() == 64)
+                {
+                    d->rootPrivateKey = element;
+                }
+                if(element.size() == 130)
+                {
+                    d->publicKeyP1 = element.left(65);
+                    d->publicKeyP2 = element.right(65);
+                }
+            }
+
+            ret &= !d->rootPrivateKey.isEmpty();
+            ret &= !d->publicKeyP1.isEmpty();
+            ret &= !d->publicKeyP1.isEmpty();
+        }
     }
 
     return ret;
@@ -477,14 +546,6 @@ LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
                     fileName = arguments[i];
                 }
             }
-            else if(argument == "--rootPrivateKey")
-            {
-                i++;
-                if(i < arguments.size())
-                {
-                    info.rootPrivateKey = arguments[i];
-                }
-            }
             else if(argument.startsWith("--targetVersion"))
             {
                 QStringList target = argument.split("=");
@@ -523,8 +584,8 @@ LedgerAppInfo QtumLedgerTool::appInfo(InstallDevice::DeviceType type)
     return info;
 }
 
-LedgerAppInfo::LedgerAppInfo()
+void QtumLedgerTool::getPubKey(QString &publicKeyP1, QString &publicKeyP2)
 {
-    publicKeyP1 = QString("0473fc4f90e9f45df2baa558311481a886a91f7a32501878d6cd4933f672f5191").toUpper();
-    publicKeyP2 = QString("c456ded3137b008dd691ed76ded40953c3f41c4ab7d0e6329c8e787e5059a2834").toUpper();
+    publicKeyP1 = d->publicKeyP1;
+    publicKeyP2 = d->publicKeyP2;
 }
