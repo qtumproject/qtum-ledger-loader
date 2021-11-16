@@ -149,7 +149,7 @@ bool QtumLedgerInstallerDialog::parseErrorMessage(QString &message, bool& depend
 
     if(errorMessage.contains("ModuleNotFoundError", Qt::CaseInsensitive) && errorMessage.contains("ledgerblue", Qt::CaseInsensitive))
     {
-        message = tr("Module ledgerblue not found, you can install it manually with the command:") + "\n" + DEPENDENCY_INSTALL_CMD;
+        message = tr("Module ledgerblue not found, you can install it manually with the command:") + "\n" + d->tool->dependencyCommand();
         dependency = true;
         return true;
     }
