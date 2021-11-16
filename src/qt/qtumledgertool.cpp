@@ -19,8 +19,8 @@ static const QString ID_FORMAT = ":/ledger/%1_app_id";
 static const QString RC_PATH_FORMAT = ":/ledger";
 static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\n\nPlease update the ledger firmware to the most recent version.";
 
-static const QString DEPENDENCY_INSTALL_CMD = "python3 -m pip install --user ledgerblue";
-static const QString DEPENDENCY_SHOW_CMD = "python3 -m pip show ledgerblue";
+static const QString DEPENDENCY_INSTALL_CMD = "python -m pip install --user ledgerblue";
+static const QString DEPENDENCY_SHOW_CMD = "python -m pip show ledgerblue";
 
 bool fMainnet = true;
 
@@ -163,13 +163,13 @@ bool InstallDevice::deleteCommand(QString &program, QStringList &arguments)
 
 bool InstallDevice::firmwareCommand(QString &program, QStringList &arguments)
 {
-    QString command = "python3 -m ledgerblue.checkGenuine --targetId 0x31100004";
+    QString command = "python -m ledgerblue.checkGenuine --targetId 0x31100004";
     return getCommand(command, program, arguments);
 }
 
 bool InstallDevice::genKeyPairCommand(QString &program, QStringList &arguments)
 {
-    QString command = "python3 -m ledgerblue.genCAPair";
+    QString command = "python -m ledgerblue.genCAPair";
     return getCommand(command, program, arguments);
 }
 
@@ -498,6 +498,7 @@ bool QtumLedgerTool::installDependency()
         arguments = DEPENDENCY_SHOW_CMD.split(" ");
         program = arguments[0];
         arguments.removeAt(0);
+        getProgram(program);
         d->process.start(program, arguments);
         d->fStarted = true;
         wait();
@@ -665,7 +666,7 @@ bool QtumLedgerTool::getPythonVersion(const QString &execName, int &execVersion)
 
 bool QtumLedgerTool::getProgram(QString &program)
 {
-    if(program == "python3" || program == "python")
+    if(program.startsWith("python"))
     {
         QString execName;
         if(getPythonExec(execName))
@@ -686,6 +687,6 @@ QString QtumLedgerTool::dependencyCommand()
     QString command = DEPENDENCY_INSTALL_CMD;
     QString execName;
     if(getPythonExec(execName))
-        command = command.replace("python3", execName);
+        command = command.replace("python", execName);
     return command;
 }
