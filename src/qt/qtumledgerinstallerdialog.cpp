@@ -267,13 +267,7 @@ void QtumLedgerInstallerDialog::aboutClicked()
 
 void QtumLedgerInstallerDialog::createMenuBar()
 {
-#ifdef Q_OS_MAC
-    // Create a decoupled menu bar on Mac which stays even if the window is closed
-    appMenuBar = new QMenuBar();
-#else
-    // Get the main window's menu bar on other platforms
     appMenuBar = menuBar();
-#endif
 
     QMenu *network = appMenuBar->addMenu(tr("&Network"));
     QActionGroup* group = new QActionGroup(this);
