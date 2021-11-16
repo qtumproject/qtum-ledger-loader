@@ -48,6 +48,7 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     ui->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
 
     ui->labelApp->setStyleSheet("QLabel { color: red; }");
+    ui->labelNetwork->setStyleSheet("QLabel { color: red; }");
 
     createActions();
     createMenuBar();
@@ -56,7 +57,7 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     if (!settings.contains("fCheckForUpdates"))
         settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
     bool fCheckForUpdates = settings.value("fCheckForUpdates").toBool();
-    ui->updateCheckBox->setChecked(fCheckForUpdates);
+//    ui->updateCheckBox->setChecked(fCheckForUpdates);
     if(fCheckForUpdates)
     {
         QTimer::singleShot(1000, this, SLOT(checkForUpdates()));
@@ -185,11 +186,7 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
         return ui->labelApp->setText("");
     case InstallDevice::StakeNanoS:
         ui->labelInfo->setText(appInfo(InstallDevice::StakeNanoS));
-        return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the PIN lock:\n"
-                                        "Nano S > Settings > Security > PIN lock > Off\n"
-                                        "\n"
-                                        "When Qtum Stake is removed, please turn on the PIN lock:\n"
-                                        "Nano S > Settings > Security > PIN lock > 10 minutes\n"));
+        return ui->labelApp->setText(tr("Turn off PIN lock on your ledger to use Qtum Stake app (Settings > Security > PIN lock > Off)"));
     default:
         break;
     }
@@ -353,12 +350,14 @@ bool QtumLedgerInstallerDialog::checkFirmware(QString &message)
 void QtumLedgerInstallerDialog::mainnetClicked()
 {
     fMainnet = true;
+    ui->labelNetwork->setText("Mainnet");
     refreshNetAppInfo();
 }
 
 void QtumLedgerInstallerDialog::testnetClicked()
 {
     fMainnet = false;
+    ui->labelNetwork->setText("Testnet");
     refreshNetAppInfo();
 }
 
