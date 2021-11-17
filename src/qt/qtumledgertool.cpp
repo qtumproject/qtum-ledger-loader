@@ -675,6 +675,7 @@ bool QtumLedgerTool::getProgram(QString &program)
         }
         else
         {
+            program = "python3";
             return false;
         }
     }
