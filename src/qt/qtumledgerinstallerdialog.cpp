@@ -18,7 +18,7 @@
 #include <QMenuBar>
 #include <QActionGroup>
 
-static const bool DEFAULT_CHECK_FOR_UPDATES = true;
+static const bool DEFAULT_CHECK_FOR_UPDATES = false;
 
 class QtumLedgerInstallerDialogPriv
 {
@@ -48,7 +48,6 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     ui->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
 
     ui->labelApp->setStyleSheet("QLabel { color: red; }");
-    ui->labelNetwork->setStyleSheet("QLabel { color: red; }");
 
     createActions();
     createMenuBar();
@@ -57,7 +56,9 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     if (!settings.contains("fCheckForUpdates"))
         settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
     bool fCheckForUpdates = settings.value("fCheckForUpdates").toBool();
-//    ui->updateCheckBox->setChecked(fCheckForUpdates);
+    ui->updateCheckBox->setChecked(fCheckForUpdates);
+    ui->radioMainnet->setChecked(true);
+
     if(fCheckForUpdates)
     {
         QTimer::singleShot(1000, this, SLOT(checkForUpdates()));
@@ -235,15 +236,8 @@ QString QtumLedgerInstallerDialog::getDeviceAppTitle(bool install)
 
 void QtumLedgerInstallerDialog::createActions()
 {
-    mainnetAction = new QAction(tr("&Mainnet Apps"), this);
-    mainnetAction->setStatusTip(tr("Select mainnet ledger applications"));
-    mainnetAction->setCheckable(true);
-    connect(mainnetAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::mainnetClicked);
-
-    testnetAction = new QAction(tr("&Testnet Apps"), this);
-    testnetAction->setStatusTip(tr("Select testnet ledger applications"));
-    testnetAction->setCheckable(true);
-    connect(testnetAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::testnetClicked);
+    connect(ui->radioMainnet, &QRadioButton::clicked, this, &QtumLedgerInstallerDialog::mainnetClicked);
+    connect(ui->radioTestnet, &QRadioButton::clicked, this, &QtumLedgerInstallerDialog::testnetClicked);
 
     aboutAction = new QAction(tr("&About %1").arg(PACKAGE_NAME), this);
     aboutAction->setStatusTip(tr("Show information about %1").arg(PACKAGE_NAME));
@@ -265,14 +259,6 @@ void QtumLedgerInstallerDialog::aboutClicked()
 void QtumLedgerInstallerDialog::createMenuBar()
 {
     appMenuBar = menuBar();
-
-    QMenu *network = appMenuBar->addMenu(tr("&Network"));
-    QActionGroup* group = new QActionGroup(this);
-    group->addAction(mainnetAction);
-    group->addAction(testnetAction);
-    mainnetAction->setChecked(true);
-    network->addAction(mainnetAction);
-    network->addAction(testnetAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(aboutAction);
@@ -350,14 +336,12 @@ bool QtumLedgerInstallerDialog::checkFirmware(QString &message)
 void QtumLedgerInstallerDialog::mainnetClicked()
 {
     fMainnet = true;
-    ui->labelNetwork->setText("Mainnet");
     refreshNetAppInfo();
 }
 
 void QtumLedgerInstallerDialog::testnetClicked()
 {
     fMainnet = false;
-    ui->labelNetwork->setText("Testnet");
     refreshNetAppInfo();
 }
 
