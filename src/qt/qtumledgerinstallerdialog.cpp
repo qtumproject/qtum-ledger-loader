@@ -44,8 +44,8 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
     QString title = windowTitle() + " " + QString::fromStdString(FormatFullVersion());
     setWindowTitle(title);
 
-    ui->cbLedgerApp->addItem(tr("Qtum Wallet Nano S"), InstallDevice::WalletNanoS);
-    ui->cbLedgerApp->addItem(tr("Qtum Stake Nano S"), InstallDevice::StakeNanoS);
+    ui->cbLedgerApp->addItem(tr("Qtum Wallet"), InstallDevice::WalletNanoS);
+    ui->cbLedgerApp->addItem(tr("Qtum Stake"), InstallDevice::StakeNanoS);
 
     ui->labelApp->setStyleSheet("QLabel { color: red; }");
 
@@ -296,7 +296,7 @@ QString QtumLedgerInstallerDialog::uninstallInfo(InstallDevice::DeviceType type)
 QString QtumLedgerInstallerDialog::appInfo(InstallDevice::DeviceType type)
 {
     LedgerAppInfo info = d->tool->appInfo(type);
-    QString message = tr("App name:\t%1\nApp version:\t%2\nTarget version:\t%3\nHash app.hex:\t%4\n");
+    QString message = tr("App name:\t%1\nApp version:\t%2\nTarget firmware:\t%3\nSHA-256 hash:\t%4\n");
     return message.arg(info.appName, info.appVersion, info.targetVersion, info.fileHash);
 }
 
