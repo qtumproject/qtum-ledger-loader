@@ -36,6 +36,12 @@ int GuiMain(int argc, char* argv[])
     QApplication::setOrganizationName(QAPP_ORG_NAME);
     QApplication::setOrganizationDomain(QAPP_ORG_DOMAIN);
     QApplication::setApplicationName(QAPP_APP_NAME_DEFAULT);
+    QFont font = QApplication::font();
+    if(font.pointSize() < 10)
+    {
+        font.setPointSize(10);
+        QApplication::setFont(font);
+    }
 
     // Set network style
     QString networkID = "main";
