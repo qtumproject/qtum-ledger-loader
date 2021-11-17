@@ -19,6 +19,9 @@ static const QString ID_FORMAT = ":/ledger/%1_app_id";
 static const QString RC_PATH_FORMAT = ":/ledger";
 static const char* UPDATE_FIRMWARE_FORMAT = "Firmware version: %1.\nTarget version: %2.\n\nPlease update the ledger firmware to the most recent version.";
 
+static const QString DEPENDENCY_INSTALL_CMD = "python -m pip install --user ledgerblue";
+static const QString DEPENDENCY_SHOW_CMD = "python -m pip show ledgerblue";
+
 bool fMainnet = true;
 
 bool isMainnet()
@@ -160,13 +163,13 @@ bool InstallDevice::deleteCommand(QString &program, QStringList &arguments)
 
 bool InstallDevice::firmwareCommand(QString &program, QStringList &arguments)
 {
-    QString command = "python3 -m ledgerblue.checkGenuine --targetId 0x31100004";
+    QString command = "python -m ledgerblue.checkGenuine --targetId 0x31100004";
     return getCommand(command, program, arguments);
 }
 
 bool InstallDevice::genKeyPairCommand(QString &program, QStringList &arguments)
 {
-    QString command = "python3 -m ledgerblue.genCAPair";
+    QString command = "python -m ledgerblue.genCAPair";
     return getCommand(command, program, arguments);
 }
 
@@ -241,6 +244,7 @@ bool QtumLedgerTool::installApp(InstallDevice::DeviceType type)
     QString program;
     QStringList arguments;
     bool ret = device.loadCommand(program, arguments);
+    getProgram(program);
     if(!d->rootPrivateKey.isEmpty())
     {
         arguments.push_back("--rootPrivateKey");
@@ -271,6 +275,7 @@ bool QtumLedgerTool::removeApp(InstallDevice::DeviceType type)
     QString program;
     QStringList arguments;
     bool ret = device.deleteCommand(program, arguments);
+    getProgram(program);
     if(!d->rootPrivateKey.isEmpty())
     {
         arguments.push_back("--rootPrivateKey");
@@ -301,6 +306,7 @@ bool QtumLedgerTool::checkFirmware(InstallDevice::DeviceType type, QString& mess
     QString program;
     QStringList arguments;
     bool ret = device.firmwareCommand(program, arguments);
+    getProgram(program);
     if(ret)
     {
         d->process.start(program, arguments);
@@ -328,6 +334,7 @@ bool QtumLedgerTool::getKeyPair()
     QString program;
     QStringList arguments;
     bool ret = device.genKeyPairCommand(program, arguments);
+    getProgram(program);
     if(ret)
     {
         d->process.start(program, arguments);
@@ -479,6 +486,7 @@ bool QtumLedgerTool::installDependency()
     QStringList arguments = DEPENDENCY_INSTALL_CMD.split(" ");
     QString program = arguments[0];
     arguments.removeAt(0);
+    getProgram(program);
     d->process.start(program, arguments);
     d->fStarted = true;
     wait();
@@ -490,6 +498,7 @@ bool QtumLedgerTool::installDependency()
         arguments = DEPENDENCY_SHOW_CMD.split(" ");
         program = arguments[0];
         arguments.removeAt(0);
+        getProgram(program);
         d->process.start(program, arguments);
         d->fStarted = true;
         wait();
@@ -588,4 +597,97 @@ void QtumLedgerTool::getPubKey(QString &publicKeyP1, QString &publicKeyP2)
 {
     publicKeyP1 = d->publicKeyP1;
     publicKeyP2 = d->publicKeyP2;
+}
+
+bool QtumLedgerTool::getPythonExec(QString &execName)
+{
+    execName = "python3";
+    int execVersion = -1;
+    if(getPythonVersion(execName, execVersion) && execVersion > 2)
+        return true;
+
+    execName = "python";
+    if(getPythonVersion(execName, execVersion) && execVersion > 2)
+        return true;
+
+    if(d->strError.isEmpty())
+    {
+        d->strError = tr("Python 3 or higher is not installed.");
+    }
+
+    return false;
+}
+
+bool QtumLedgerTool::getPythonVersion(const QString &execName, int &execVersion)
+{
+    execVersion = -1;
+    QString program = execName;
+    QStringList arguments;
+    arguments << "--version";
+
+    d->process.start(program, arguments);
+    d->fStarted = true;
+    wait();
+
+    bool ret = QProcess::NormalExit == d->process.exitStatus();
+    QString line = d->strStdout.trimmed();
+    line.replace("\n", "");
+    ret &= line.startsWith("Python", Qt::CaseInsensitive);
+    if(!ret) return false;
+
+    QStringList elements = line.split(" ");
+    ret = elements.size() == 2;
+    if(!ret) return false;
+
+    QStringList pythonElements = elements[1].split(".");
+    QList<int> pythonVersion;
+    for(QString element : pythonElements)
+    {
+        bool ok = true;
+        int version = element.toInt(&ok);
+        if(ok)
+        {
+            pythonVersion.push_back(version);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    ret = pythonVersion.size() > 0;
+    if(ret)
+    {
+        execVersion = pythonVersion[0];
+    }
+
+    return ret;
+}
+
+bool QtumLedgerTool::getProgram(QString &program)
+{
+    if(program.startsWith("python"))
+    {
+        QString execName;
+        if(getPythonExec(execName))
+        {
+            program = execName;
+        }
+        else
+        {
+            program = "python3";
+            return false;
+        }
+    }
+
+    return true;
+}
+
+QString QtumLedgerTool::dependencyCommand()
+{
+    QString command = DEPENDENCY_INSTALL_CMD;
+    QString execName;
+    if(getPythonExec(execName))
+        command = command.replace("python", execName);
+    return command;
 }

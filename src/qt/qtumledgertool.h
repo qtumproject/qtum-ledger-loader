@@ -7,9 +7,6 @@
 class QtumLedgerToolPriv;
 class InstallDevicePriv;
 
-static const QString DEPENDENCY_INSTALL_CMD = "pip3 install --user ledgerblue";
-static const QString DEPENDENCY_SHOW_CMD = "pip3 show ledgerblue";
-
 extern bool fMainnet;
 
 /**
@@ -166,6 +163,12 @@ public:
      */
     void getPubKey(QString& publicKeyP1, QString& publicKeyP2);
 
+    /**
+     * @brief dependencyCommand Get install dependency command
+     * @return Dependency command
+     */
+    QString dependencyCommand();
+
 Q_SIGNALS:
 
 public Q_SLOTS:
@@ -175,6 +178,10 @@ private:
     void wait();
     bool checkDataDir();
     QString firmwareMessage(InstallDevice::DeviceType type);
+    bool getPythonExec(QString& execName);
+    bool getPythonVersion(const QString& execName, int& execVersion);
+    bool getProgram(QString& program);
+
 
     QtumLedgerToolPriv* d;
 };
