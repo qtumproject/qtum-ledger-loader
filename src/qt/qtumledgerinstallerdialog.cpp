@@ -18,7 +18,7 @@
 #include <QMenuBar>
 #include <QActionGroup>
 
-static const bool DEFAULT_CHECK_FOR_UPDATES = true;
+static const bool DEFAULT_CHECK_FOR_UPDATES = false;
 
 class QtumLedgerInstallerDialogPriv
 {
@@ -57,6 +57,8 @@ QtumLedgerInstallerDialog::QtumLedgerInstallerDialog(QWidget *parent) :
         settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
     bool fCheckForUpdates = settings.value("fCheckForUpdates").toBool();
     ui->updateCheckBox->setChecked(fCheckForUpdates);
+    ui->radioMainnet->setChecked(true);
+
     if(fCheckForUpdates)
     {
         QTimer::singleShot(1000, this, SLOT(checkForUpdates()));
@@ -185,11 +187,7 @@ void QtumLedgerInstallerDialog::on_cbLedgerApp_currentIndexChanged(int index)
         return ui->labelApp->setText("");
     case InstallDevice::StakeNanoS:
         ui->labelInfo->setText(appInfo(InstallDevice::StakeNanoS));
-        return ui->labelApp->setText(tr("When Qtum Stake is installed, please turn off the PIN lock:\n"
-                                        "Nano S > Settings > Security > PIN lock > Off\n"
-                                        "\n"
-                                        "When Qtum Stake is removed, please turn on the PIN lock:\n"
-                                        "Nano S > Settings > Security > PIN lock > 10 minutes\n"));
+        return ui->labelApp->setText(tr("Turn off PIN lock on your ledger to use Qtum Stake app (Settings > Security > PIN lock > Off)"));
     default:
         break;
     }
@@ -238,15 +236,8 @@ QString QtumLedgerInstallerDialog::getDeviceAppTitle(bool install)
 
 void QtumLedgerInstallerDialog::createActions()
 {
-    mainnetAction = new QAction(tr("&Mainnet Apps"), this);
-    mainnetAction->setStatusTip(tr("Select mainnet ledger applications"));
-    mainnetAction->setCheckable(true);
-    connect(mainnetAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::mainnetClicked);
-
-    testnetAction = new QAction(tr("&Testnet Apps"), this);
-    testnetAction->setStatusTip(tr("Select testnet ledger applications"));
-    testnetAction->setCheckable(true);
-    connect(testnetAction, &QAction::triggered, this, &QtumLedgerInstallerDialog::testnetClicked);
+    connect(ui->radioMainnet, &QRadioButton::clicked, this, &QtumLedgerInstallerDialog::mainnetClicked);
+    connect(ui->radioTestnet, &QRadioButton::clicked, this, &QtumLedgerInstallerDialog::testnetClicked);
 
     aboutAction = new QAction(tr("&About %1").arg(PACKAGE_NAME), this);
     aboutAction->setStatusTip(tr("Show information about %1").arg(PACKAGE_NAME));
@@ -267,21 +258,7 @@ void QtumLedgerInstallerDialog::aboutClicked()
 
 void QtumLedgerInstallerDialog::createMenuBar()
 {
-#ifdef Q_OS_MAC
-    // Create a decoupled menu bar on Mac which stays even if the window is closed
-    appMenuBar = new QMenuBar();
-#else
-    // Get the main window's menu bar on other platforms
     appMenuBar = menuBar();
-#endif
-
-    QMenu *network = appMenuBar->addMenu(tr("&Network"));
-    QActionGroup* group = new QActionGroup(this);
-    group->addAction(mainnetAction);
-    group->addAction(testnetAction);
-    mainnetAction->setChecked(true);
-    network->addAction(mainnetAction);
-    network->addAction(testnetAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(aboutAction);
